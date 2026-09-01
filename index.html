@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تعلم الروسية بالعربي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --night:#0F1B30;
+    --night-deep:#0A1322;
+    --gold:#D4A94F;
+    --gold-soft:#E8C97A;
+    --birch:#F5F0E4;
+    --brick:#A6453F;
+    --ice:#7FA3C4;
+    --line: rgba(245,240,228,0.14);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{background:var(--night);color:var(--birch);}
+  body{
+    font-family:'Tajawal', sans-serif;
+    line-height:1.9;
+    overflow-x:hidden;
+  }
+  h1,h2,.display{
+    font-family:'Aref Ruqaa', serif;
+    font-weight:700;
+  }
+
+  /* ---------- background texture ---------- */
+  .stars{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      radial-gradient(1.5px 1.5px at 20% 30%, rgba(245,240,228,.5), transparent),
+      radial-gradient(1.5px 1.5px at 70% 15%, rgba(245,240,228,.4), transparent),
+      radial-gradient(1px 1px at 40% 70%, rgba(245,240,228,.35), transparent),
+      radial-gradient(1.5px 1.5px at 85% 60%, rgba(245,240,228,.4), transparent),
+      radial-gradient(1px 1px at 55% 40%, rgba(245,240,228,.3), transparent),
+      radial-gradient(1.5px 1.5px at 10% 80%, rgba(245,240,228,.3), transparent),
+      radial-gradient(1px 1px at 92% 88%, rgba(245,240,228,.3), transparent);
+    background-repeat:no-repeat;
+  }
+
+  .wrap{ position:relative; z-index:1; max-width:640px; margin:0 auto; padding:0 24px;}
+
+  /* ---------- hero ---------- */
+  .hero{
+    padding:72px 0 48px;
+    text-align:center;
+  }
+  .dome{
+    width:76px; height:auto; margin:0 auto 28px;
+    filter: drop-shadow(0 0 18px rgba(212,169,79,.35));
+  }
+  .hero h1{
+    font-size:2.5rem;
+    color:var(--gold-soft);
+    margin-bottom:14px;
+  }
+  .hero .kicker{
+    color:var(--ice);
+    font-size:.95rem;
+    letter-spacing:.03em;
+    margin-bottom:6px;
+  }
+  .hero p{
+    color:rgba(245,240,228,.78);
+    font-size:1.05rem;
+    max-width:480px;
+    margin:0 auto;
+  }
+
+  /* ---------- sections ---------- */
+  section{
+    padding:40px 0;
+    border-top:1px solid var(--line);
+  }
+  section h2{
+    font-size:1.6rem;
+    color:var(--gold-soft);
+    margin-bottom:18px;
+  }
+  section p{ color:rgba(245,240,228,.85); font-size:1.02rem; }
+  section p + p{ margin-top:14px; }
+
+  .reason-list{
+    list-style:none;
+    display:flex; flex-direction:column; gap:14px;
+    margin-top:18px;
+  }
+  .reason-list li{
+    display:flex; gap:12px; align-items:flex-start;
+    color:rgba(245,240,228,.85);
+    font-size:1rem;
+  }
+  .reason-list .mark{
+    flex:none; width:8px; height:8px; margin-top:10px;
+    border-radius:50%; background:var(--gold);
+  }
+
+  .honest-box{
+    margin-top:20px;
+    border-right:3px solid var(--brick);
+    padding-right:18px;
+  }
+  .honest-box p{ color:rgba(245,240,228,.82); }
+
+  .challenge{
+    display:flex; gap:16px; align-items:flex-start;
+    margin-top:20px;
+    padding:16px 18px;
+    background:rgba(245,240,228,.04);
+    border:1px solid var(--line);
+    border-radius:4px;
+  }
+  .challenge .num{
+    font-family:'Aref Ruqaa', serif;
+    font-size:1.6rem;
+    color:var(--gold);
+    flex:none;
+  }
+  .challenge h3{
+    font-size:1.05rem; color:var(--birch); margin-bottom:6px; font-weight:700;
+  }
+  .challenge p{ font-size:.96rem; color:rgba(245,240,228,.75); }
+
+  /* ---------- system grid ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-top:20px;
+  }
+  .card{
+    background:rgba(245,240,228,.05);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:18px 16px;
+  }
+  .card .icon{ font-size:1.4rem; margin-bottom:8px; display:block; }
+  .card h3{ font-size:.98rem; color:var(--gold-soft); margin-bottom:6px; font-weight:700; }
+  .card p{ font-size:.88rem; color:rgba(245,240,228,.7); line-height:1.7; }
+
+  .closing{
+    text-align:center;
+    padding:56px 0 72px;
+  }
+  .closing p{ color:rgba(245,240,228,.75); margin-bottom:24px; font-size:1.02rem; }
+  .cta{
+    display:inline-block;
+    font-family:'Tajawal', sans-serif;
+    font-weight:800;
+    font-size:1.05rem;
+    color:var(--night-deep);
+    background:linear-gradient(135deg, var(--gold-soft), var(--gold));
+    padding:14px 40px;
+    border-radius:2px;
+    letter-spacing:.02em;
+    box-shadow:0 8px 24px rgba(212,169,79,.25);
+    cursor:pointer;
+    border:none;
+  }
+
+  @media (max-width:420px){
+    .hero h1{ font-size:2rem; }
+    .grid{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stars"></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <svg class="dome" viewBox="0 0 100 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M50 6 C68 6 78 26 78 42 C78 56 66 62 50 62 C34 62 22 56 22 42 C22 26 32 6 50 6 Z" fill="#D4A94F"/>
+      <circle cx="50" cy="8" r="4" fill="#D4A94F"/>
+      <rect x="46" y="62" width="8" height="14" fill="#7FA3C4"/>
+      <path d="M20 76 H80 L74 138 H26 Z" fill="#0F1B30" stroke="#7FA3C4" stroke-width="1.5"/>
+      <path d="M26 92 H74 M26 108 H74 M26 124 H74" stroke="#7FA3C4" stroke-width="1"/>
+    </svg>
+    <div class="kicker">مرحباً بيك</div>
+    <h1>تعلم الروسية بالعربي</h1>
+    <p>لغة أكتر من 150 مليون إنسان، هتتعلمها معانا خطوة خطوة، من غير تعقيد ومن غير وعود كاذبة.</p>
+  </div>
+
+  <section>
+    <h2>ليه تتعلم الروسية؟</h2>
+    <ul class="reason-list">
+      <li><span class="mark"></span>بتخطط تدرس أو تشتغل في روسيا — خصوصاً في الطب والهندسة، وجهات كتير بتفضلها الطلاب العرب</li>
+      <li><span class="mark"></span>بتحب الأدب أو السينما الروسية — تولستوي، دوستويفسكي، أفلام حقبة كاملة من التاريخ</li>
+      <li><span class="mark"></span>مهتم باللغات السلافية عموماً — الروسية بوابتك الطبيعية ليها</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>هل هي صعبة؟</h2>
+    <div class="honest-box">
+      <p>هنكون صريحين معاك من أول لحظة: الروسية مش أسهل لغة في الدنيا، لكنها مش مستحيلة برضه. أكتر حاجتين هيواجهوك في البداية:</p>
+    </div>
+
+    <div class="challenge">
+      <span class="num">١</span>
+      <div>
+        <h3>أبجدية جديدة (السيريلية)</h3>
+        <p>هتاخد وقت في الأول، لكنها بتتعلم أسرع مما تتخيل — لأن الكلمة الروسية بتتكتب زي ما بتتنطق تقريباً، من غير تعقيد استثناءات زي الإنجليزي.</p>
+      </div>
+    </div>
+
+    <div class="challenge">
+      <span class="num">٢</span>
+      <div>
+        <h3>الحالات النحوية (падежи)</h3>
+        <p>آخر الكلمة بيتغير حسب دورها في الجملة، وده نظام مش موجود بشكله ده في العربي — بس هنبنيه معاك تدريجياً، مش دفعة واحدة.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>إزاي هنتعلم مع بعض؟</h2>
+    <p>مش هنرمي عليك كل حاجة مرة واحدة. هنبدأ بالحروف، بعدين كلمات بسيطة، وهنبني فوق بعض خطوة بخطوة. الهدف إنك في الآخر تقدر تقرا لافتة، تسأل عن الطريق، وتتابع كلام بسيط من غير ما تحس إنك بتحفظ من غير فهم.</p>
+  </section>
+
+  <section>
+    <h2>إزاي التطبيق شغال؟</h2>
+    <div class="grid">
+      <div class="card">
+        <span class="icon">⭐</span>
+        <h3>نقاط خبرة</h3>
+        <p>كل درس أو تمرين بتخلصه بتكسب نقاط XP</p>
+      </div>
+      <div class="card">
+        <span class="icon">🔥</span>
+        <h3>الستريك</h3>
+        <p>حافظ على أيامك المتتالية، حتى بـ5 دقايق في اليوم</p>
+      </div>
+      <div class="card">
+        <span class="icon">🏆</span>
+        <h3>مستويات وشارات</h3>
+        <p>كل ما تتقدم، بتفتح مستويات وإنجازات جديدة</p>
+      </div>
+      <div class="card">
+        <span class="icon">🔊</span>
+        <h3>صوت حقيقي</h3>
+        <p>لكل كلمة وحرف، عشان تسمع النطق الصح</p>
+      </div>
+      <div class="card">
+        <span class="icon">✍️</span>
+        <h3>كتابة بالخط</h3>
+        <p>اتمرن تكتب الحروف السيريلية بإيدك على الشاشة</p>
+      </div>
+      <div class="card">
+        <span class="icon">📝</span>
+        <h3>مراجعة ذكية</h3>
+        <p>النظام بيفكرك بالكلمات اللي محتاجة مراجعة أكتر</p>
+      </div>
+    </div>
+    <p style="margin-top:18px; font-size:.92rem; color:rgba(245,240,228,.6);">كل التقدم بتاعك بيتسجل تلقائي، فتقدر تسيب التطبيق وترجعله وهو فاكر لك مكانك بالظبط.</p>
+  </section>
+
+  <div class="closing">
+    <p>يلا نبدأ رحلتنا مع أول حرف سيريلي!</p>
+    <a class="cta" href="home.html" style="text-decoration:none; display:inline-block;">يلا نبدأ 💪</a>
+  </div>
+
+</div>
+
+</body>
+</html>

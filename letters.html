@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الحروف السيريلية — تعلم الروسية بالعربي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .page-head{ padding:28px 0 8px; text-align:center; }
+  .page-head h1{ font-size:2rem; color:var(--gold-soft); margin-bottom:8px; }
+  .page-head p{ color:rgba(245,240,228,.7); font-size:.95rem; }
+
+  .group-nav{
+    display:flex; gap:8px; padding:20px 0 8px; overflow-x:auto;
+  }
+  .group-nav button{
+    flex:none;
+    font-family:'Tajawal', sans-serif; font-size:.88rem; font-weight:700;
+    color:var(--birch); background:transparent; border:1px solid var(--line);
+    padding:9px 16px; border-radius:20px; cursor:pointer; white-space:nowrap;
+  }
+  .group-nav button.active{ background:var(--gold); color:var(--night-deep); border-color:var(--gold); }
+
+  .group-desc{ padding:14px 0 4px; font-size:.9rem; color:rgba(245,240,228,.65); }
+
+  .letters-grid{
+    display:grid; grid-template-columns:repeat(4, 1fr); gap:10px;
+    padding:16px 0 32px;
+  }
+  .letter-tile{
+    aspect-ratio:1;
+    background:rgba(245,240,228,.05);
+    border:1px solid var(--line);
+    border-radius:6px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    cursor:pointer;
+    position:relative;
+  }
+  .letter-tile .glyph{ font-family:'Aref Ruqaa', serif; font-size:1.7rem; color:var(--birch); }
+  .letter-tile .glyph-small{ font-size:.95rem; color:rgba(245,240,228,.5); }
+  .letter-tile.learned{ border-color:var(--green); }
+  .letter-tile.learned::after{
+    content:"✓"; position:absolute; top:4px; left:6px;
+    color:var(--green); font-size:.8rem; font-weight:800;
+  }
+  .letter-tile:active{ transform:scale(.96); }
+
+  /* ---- practice panel ---- */
+  .practice{
+    display:none;
+    border-top:1px solid var(--line);
+    padding:26px 0 40px;
+  }
+  .practice.open{ display:block; }
+  .practice-head{ display:flex; align-items:center; gap:18px; margin-bottom:18px; }
+  .practice-head .big-glyph{ font-family:'Aref Ruqaa', serif; font-size:3.4rem; color:var(--gold-soft); line-height:1; }
+  .practice-head .meta h3{ font-size:1.1rem; color:var(--birch); margin-bottom:4px; }
+  .practice-head .meta p{ font-size:.88rem; color:rgba(245,240,228,.65); }
+
+  .sound-row{ display:flex; gap:10px; margin-bottom:20px; }
+  .icon-btn{
+    display:flex; align-items:center; gap:8px;
+    background:rgba(245,240,228,.06); border:1px solid var(--line);
+    color:var(--birch); font-family:'Tajawal',sans-serif; font-size:.9rem;
+    padding:10px 16px; border-radius:20px; cursor:pointer;
+  }
+  .icon-btn:active{ transform:scale(.97); }
+
+  .example{
+    background:rgba(245,240,228,.04);
+    border-right:3px solid var(--gold);
+    padding:12px 16px; margin-bottom:20px; font-size:.95rem;
+    color:rgba(245,240,228,.85);
+  }
+
+  .write-box{ text-align:center; margin-bottom:16px; }
+  .write-box canvas{
+    background:rgba(245,240,228,.08);
+    border:1px dashed var(--line);
+    border-radius:8px;
+    touch-action:none;
+    width:100%; max-width:280px; height:220px;
+  }
+  .write-controls{ display:flex; gap:10px; justify-content:center; margin-top:10px; }
+
+  .practice-actions{ display:flex; gap:10px; margin-top:22px; }
+
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+    background:var(--gold); color:var(--night-deep); font-weight:800;
+    padding:10px 22px; border-radius:20px; font-size:.9rem;
+    opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease;
+    z-index:10;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+
+<div class="app-header">
+  <a class="icon-circle" href="home.html" aria-label="الرئيسية">←</a>
+  <div class="stats" id="statsBar"></div>
+</div>
+
+<div class="wrap has-bottom-nav">
+
+  <div class="page-head">
+    <h1>الحروف السيريلية</h1>
+    <p>٣٣ حرف، مقسمين لمجموعات عشان تتعلمهم بالترتيب الصح</p>
+  </div>
+
+  <div class="group-nav" id="groupNav"></div>
+  <div class="group-desc" id="groupDesc"></div>
+  <div class="letters-grid" id="lettersGrid"></div>
+
+  <div class="practice" id="practice">
+    <div class="practice-head">
+      <div class="big-glyph" id="pGlyph">А</div>
+      <div class="meta">
+        <h3 id="pName">حرف الألف</h3>
+        <p id="pSound">بينطق زي حرف الألف العربي</p>
+      </div>
+    </div>
+
+    <div class="sound-row">
+      <button class="icon-btn" id="playSound">🔊 اسمع النطق</button>
+    </div>
+
+    <div class="example" id="pExample">مثال: <strong>мама</strong> — يعني "ماما"</div>
+
+    <div class="write-box">
+      <canvas id="writeCanvas" width="280" height="220"></canvas>
+      <div class="write-controls">
+        <button class="btn-ghost" id="clearCanvas">امسح</button>
+      </div>
+    </div>
+
+    <div class="practice-actions">
+      <button class="cta" id="markLearned">تعلمت الحرف ده ⭐</button>
+      <button class="btn-ghost" id="closePractice">قفل</button>
+    </div>
+  </div>
+
+</div>
+
+<nav class="bottom-nav">
+  <a href="home.html">
+    <span class="tab-icon">🏠</span>
+    <span>الرئيسية</span>
+  </a>
+  <a class="active" href="letters.html">
+    <span class="tab-icon">🔤</span>
+    <span>الحروف</span>
+  </a>
+  <a class="disabled" href="#">
+    <span class="tab-icon">🏅</span>
+    <span>إنجازاتي</span>
+    <span class="dot"></span>
+  </a>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script src="progress.js"></script>
+<script>
+/* ===================== بيانات الحروف ===================== */
+const LETTER_GROUPS = [
+  {
+    id: "familiar",
+    title: "زي اللاتيني، نفس الصوت",
+    desc: "الحروف دي شكلها هيفكرك بالحروف اللاتينية، وصوتها كمان قريب — أسهل نقطة بداية.",
+    letters: [
+      { u:"А", l:"а", name:"А", sound:"بينطق زي الألف العربي (a)", example:"мама — ماما" },
+      { u:"О", l:"о", name:"О", sound:"بينطق زي الواو المفتوحة (o)", example:"он — هو" },
+      { u:"К", l:"к", name:"К", sound:"بينطق زي الكاف (k)", example:"кот — قطة" },
+      { u:"Е", l:"е", name:"Е", sound:"بينطق زي (يه) — ye", example:"её — بتاعها" },
+      { u:"Т", l:"т", name:"Т", sound:"بينطق زي التاء (t)", example:"ты — انت" },
+      { u:"М", l:"м", name:"М", sound:"بينطق زي الميم (m)", example:"мир — سلام/عالم" }
+    ]
+  },
+  {
+    id: "trap",
+    title: "زي اللاتيني، بس الفخ! 🪤",
+    desc: "دي أخطر مجموعة — شكل الحرف لاتيني، لكن صوته حاجة تانية خالص. ركز هنا كويس.",
+    letters: [
+      { u:"В", l:"в", name:"В", sound:"شكله زي B بس بينطق زي الفاء/v", example:"вода — مياه" },
+      { u:"Н", l:"н", name:"Н", sound:"شكله زي H بس بينطق زي النون/n", example:"нет — لا" },
+      { u:"Р", l:"р", name:"Р", sound:"شكله زي P بس بينطق زي الراء/r", example:"рука — إيد" },
+      { u:"С", l:"с", name:"С", sound:"شكله زي C بس بينطق زي السين/s", example:"сон — نوم" },
+      { u:"У", l:"у", name:"У", sound:"شكله زي Y بس بينطق زي الواو/u", example:"ум — عقل" },
+      { u:"Х", l:"х", name:"Х", sound:"شكله زي X بس بينطق زي الخاء/kh", example:"хлеб — عيش" }
+    ]
+  },
+  {
+    id: "new",
+    title: "حروف جديدة تماماً",
+    desc: "شكلها مالوش علاقة باللاتيني، لازم تتعلمها من الصفر — بس مفيهاش لخبطة زي المجموعة اللي فاتت.",
+    letters: [
+      { u:"Б", l:"б", name:"Б", sound:"بينطق زي الباء (b)", example:"брат — أخ" },
+      { u:"Г", l:"г", name:"Г", sound:"بينطق زي الجيم القاهرية/g", example:"город — مدينة" },
+      { u:"Д", l:"д", name:"Д", sound:"بينطق زي الدال (d)", example:"дом — بيت" },
+      { u:"Ж", l:"ж", name:"Ж", sound:"صوت بين الج والز، زي j الفرنسية", example:"жена — زوجة" },
+      { u:"З", l:"з", name:"З", sound:"بينطق زي الزاي (z)", example:"зима — شتاء" },
+      { u:"И", l:"и", name:"И", sound:"بينطق زي الياء المكسورة (i)", example:"их — بتاعهم" },
+      { u:"Й", l:"й", name:"Й", sound:"زي ياء قصيرة سريعة (y)", example:"мой — بتاعي" },
+      { u:"Л", l:"л", name:"Л", sound:"بينطق زي اللام (l)", example:"лето — صيف" },
+      { u:"П", l:"п", name:"П", sound:"بينطق زي الباء المفخمة (p)", example:"папа — بابا" },
+      { u:"Ф", l:"ф", name:"Ф", sound:"بينطق زي الفاء (f)", example:"фото — صورة" },
+      { u:"Ц", l:"ц", name:"Ц", sound:"صوت (تس) متلاصق", example:"цена — سعر" },
+      { u:"Ч", l:"ч", name:"Ч", sound:"بينطق زي التش (ch)", example:"час — ساعة" },
+      { u:"Ш", l:"ш", name:"Ш", sound:"بينطق زي الشين (sh)", example:"школа — مدرسة" },
+      { u:"Щ", l:"щ", name:"Щ", sound:"شين مطولة (shch)", example:"щи — شوربة كرنب" },
+      { u:"Ъ", l:"ъ", name:"Ъ العلامة الصلبة", sound:"مالهاش صوت، بتفصل بين مقطعين", example:"объект — جسم/كيان" },
+      { u:"Ы", l:"ы", name:"Ы", sound:"صوت صعب بين الإ والأ، من عمق الحلق", example:"мы — احنا" },
+      { u:"Ь", l:"ь", name:"Ь العلامة اللينة", sound:"مالهاش صوت، بتلين الحرف اللي قبلها", example:"мать — أم" },
+      { u:"Э", l:"э", name:"Э", sound:"بينطق زي الإ المفتوحة", example:"это — ده/دي" },
+      { u:"Ю", l:"ю", name:"Ю", sound:"بينطق زي (يو)", example:"юг — جنوب" },
+      { u:"Я", l:"я", name:"Я", sound:"بينطق زي (يا)", example:"я — أنا" },
+      { u:"Ё", l:"ё", name:"Ё", sound:"بينطق زي (يو) بس مشددة", example:"ёлка — شجرة كريسماس" }
+    ]
+  }
+];
+
+/* ===================== حالة الصفحة ===================== */
+let activeGroup = 0;
+let activeLetter = null;
+
+const groupNav = document.getElementById("groupNav");
+const groupDesc = document.getElementById("groupDesc");
+const lettersGrid = document.getElementById("lettersGrid");
+const practice = document.getElementById("practice");
+
+function renderStats(){ ruRenderStatsBar("statsBar"); }
+
+function renderNav(){
+  groupNav.innerHTML = "";
+  LETTER_GROUPS.forEach((g, i) => {
+    const btn = document.createElement("button");
+    btn.textContent = g.title;
+    if (i === activeGroup) btn.classList.add("active");
+    btn.onclick = () => { activeGroup = i; closePractice(); renderNav(); renderDesc(); renderGrid(); };
+    groupNav.appendChild(btn);
+  });
+}
+
+function renderDesc(){
+  groupDesc.textContent = LETTER_GROUPS[activeGroup].desc;
+}
+
+function renderGrid(){
+  const state = RuProgress.getState();
+  lettersGrid.innerHTML = "";
+  LETTER_GROUPS[activeGroup].letters.forEach(letter => {
+    const tile = document.createElement("div");
+    tile.className = "letter-tile";
+    const learned = state.letters[letter.u] && state.letters[letter.u].learned;
+    if (learned) tile.classList.add("learned");
+    tile.innerHTML = `<span class="glyph">${letter.u}</span><span class="glyph-small">${letter.l}</span>`;
+    tile.onclick = () => openPractice(letter);
+    lettersGrid.appendChild(tile);
+  });
+}
+
+/* ===================== لوحة التمرين ===================== */
+function openPractice(letter){
+  activeLetter = letter;
+  document.getElementById("pGlyph").textContent = letter.u + " " + letter.l;
+  document.getElementById("pName").textContent = "حرف " + letter.name;
+  document.getElementById("pSound").textContent = letter.sound;
+  document.getElementById("pExample").innerHTML = "مثال: <strong>" + letter.example.split(" — ")[0] + "</strong> — يعني " + letter.example.split(" — ")[1];
+  practice.classList.add("open");
+  clearCanvas();
+  practice.scrollIntoView({ behavior:"smooth", block:"start" });
+}
+
+function closePractice(){
+  practice.classList.remove("open");
+  activeLetter = null;
+}
+
+document.getElementById("closePractice").onclick = closePractice;
+
+document.getElementById("playSound").onclick = () => {
+  if (!activeLetter) return;
+  // نظام صوت هجين: هنا Web Speech API كـ fallback فوري.
+  // لاحقاً هيتم استبداله بملفات WAV مسجلة مسبقاً (Balabolka/SAPI5) زي باقي التطبيقات.
+  try {
+    const utter = new SpeechSynthesisUtterance(activeLetter.l);
+    utter.lang = "ru-RU";
+    utter.rate = 0.8;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(utter);
+  } catch(e) { console.warn("Speech synthesis not available", e); }
+};
+
+document.getElementById("markLearned").onclick = () => {
+  if (!activeLetter) return;
+  RuProgress.markLetterLearned(activeLetter.u);
+  RuProgress.addXp(10, "letter_learned");
+  renderStats();
+  renderGrid();
+  showToast("+10 XP — تعلمت حرف " + activeLetter.u + " 🎉");
+
+  // شارة إتمام أول مجموعة
+  const state = RuProgress.getState();
+  const groupLetters = LETTER_GROUPS[activeGroup].letters.map(l => l.u);
+  const allLearned = groupLetters.every(u => state.letters[u] && state.letters[u].learned);
+  if (allLearned) {
+    RuProgress.awardBadge("group_" + LETTER_GROUPS[activeGroup].id + "_done");
+    showToast("🏆 خلصت مجموعة \"" + LETTER_GROUPS[activeGroup].title + "\" كاملة!");
+  }
+};
+
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+/* ===================== لوحة الكتابة باليد ===================== */
+const canvas = document.getElementById("writeCanvas");
+const ctx = canvas.getContext("2d");
+let drawing = false;
+
+function pos(e){
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const point = e.touches ? e.touches[0] : e;
+  return { x:(point.clientX - rect.left) * scaleX, y:(point.clientY - rect.top) * scaleY };
+}
+function start(e){ drawing = true; const p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); e.preventDefault(); }
+function move(e){
+  if (!drawing) return;
+  const p = pos(e);
+  ctx.strokeStyle = "#F5F0E4"; ctx.lineWidth = 6; ctx.lineCap = "round"; ctx.lineJoin = "round";
+  ctx.lineTo(p.x, p.y); ctx.stroke();
+  e.preventDefault();
+}
+function end(){ drawing = false; if (activeLetter) RuProgress.markLetterWritten(activeLetter.u); }
+
+canvas.addEventListener("mousedown", start);
+canvas.addEventListener("mousemove", move);
+window.addEventListener("mouseup", end);
+canvas.addEventListener("touchstart", start, { passive:false });
+canvas.addEventListener("touchmove", move, { passive:false });
+canvas.addEventListener("touchend", end);
+
+function clearCanvas(){ ctx.clearRect(0, 0, canvas.width, canvas.height); }
+document.getElementById("clearCanvas").onclick = clearCanvas;
+
+/* ===================== تشغيل أول مرة ===================== */
+renderStats();
+renderNav();
+renderDesc();
+renderGrid();
+</script>
+</body>
+</html>
