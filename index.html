@@ -67,6 +67,7 @@
     background:linear-gradient(135deg, var(--gold-soft), var(--gold));
     box-shadow:0 0 0 6px rgba(212,169,79,.12);
   }
+  .node.done .marker{ border-color:var(--ice); }
   .node.locked .marker{ opacity:.4; }
   .node.locked .side.text h3, .node.locked .side.text p{ opacity:.4; }
   .node .side.text h3{ font-size:.95rem; color:var(--birch); margin-bottom:2px; }
@@ -107,6 +108,16 @@
 
   <div class="path">
     <div class="path-heading">مسار التعلم بالكامل</div>
+
+    <a class="node-link" href="about.html">
+      <div class="node done">
+        <div class="side marker">📘</div>
+        <div class="side text">
+          <h3>المقدمة</h3>
+          <p>قبل ما تبدأ، اعرف إيه اللي هيستناك</p>
+        </div>
+      </div>
+    </a>
 
     <a class="node-link" href="letters.html">
       <div class="node active">
