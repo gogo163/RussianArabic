@@ -162,6 +162,10 @@
     <span class="tab-icon">🔤</span>
     <span>الحروف</span>
   </a>
+  <a href="vocabulary.html">
+    <span class="tab-icon">📚</span>
+    <span>المفردات</span>
+  </a>
   <a class="disabled" href="#">
     <span class="tab-icon">🏅</span>
     <span>إنجازاتي</span>
@@ -173,6 +177,7 @@
 
 <script src="progress.js"></script>
 <script src="theme.js"></script>
+<script src="matryoshka.js"></script>
 <script>
 /* ===================== بيانات الحروف ===================== */
 const LETTER_GROUPS = [
@@ -306,19 +311,28 @@ document.getElementById("playSound").onclick = () => {
 
 document.getElementById("markLearned").onclick = () => {
   if (!activeLetter) return;
+  const beforeCount = Object.values(RuProgress.getState().letters || {}).filter(l => l.learned).length;
+  const beforeStage = ruMatryoshkaStageIndex(beforeCount, 33);
+
   RuProgress.markLetterLearned(activeLetter.u);
   RuProgress.addXp(10, "letter_learned");
   renderStats();
   renderGrid();
   showToast("+10 XP — تعلمت حرف " + activeLetter.u + " 🎉");
 
-  // شارة إتمام أول مجموعة
   const state = RuProgress.getState();
+  const afterCount = Object.values(state.letters || {}).filter(l => l.learned).length;
+  const afterStage = ruMatryoshkaStageIndex(afterCount, 33);
+  if (afterStage > beforeStage) {
+    setTimeout(() => showToast("🪆 " + RU_MATRYOSHKA_STAGES[afterStage].label), 1400);
+  }
+
+  // شارة إتمام أول مجموعة
   const groupLetters = LETTER_GROUPS[activeGroup].letters.map(l => l.u);
   const allLearned = groupLetters.every(u => state.letters[u] && state.letters[u].learned);
   if (allLearned) {
     RuProgress.awardBadge("group_" + LETTER_GROUPS[activeGroup].id + "_done");
-    showToast("🏆 خلصت مجموعة \"" + LETTER_GROUPS[activeGroup].title + "\" كاملة!");
+    setTimeout(() => showToast("🏆 خلصت مجموعة \"" + LETTER_GROUPS[activeGroup].title + "\" كاملة!"), afterStage > beforeStage ? 2800 : 1400);
   }
 };
 

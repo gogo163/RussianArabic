@@ -18,6 +18,47 @@
   .id-strip .kicker{ font-size:.8rem; color:var(--ice); margin-bottom:2px; }
   .id-strip h1{ font-size:1.35rem; color:var(--gold-soft); }
 
+  .mascot-box{
+    margin:20px auto 4px;
+    max-width:220px;
+    text-align:center;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:16px 12px 12px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .mascot-box .stage{ font-size:.78rem; color:var(--text-dim2); margin-top:6px; }
+  .mascot-box .hint{ font-size:.68rem; color:var(--text-dim4); margin-top:2px; }
+  .mascot-svg-wrap{ display:flex; justify-content:center; transition:transform .35s cubic-bezier(.34,1.56,.64,1); }
+  .mascot-box.wobble .mascot-svg-wrap{ animation: ruWobble .5s ease; }
+  @keyframes ruWobble{
+    0%{ transform:rotate(0deg) scale(1); }
+    25%{ transform:rotate(-6deg) scale(1.04); }
+    50%{ transform:rotate(5deg) scale(1.06); }
+    75%{ transform:rotate(-3deg) scale(1.03); }
+    100%{ transform:rotate(0deg) scale(1); }
+  }
+
+  .wod-card{
+    margin:16px 0 4px;
+    display:flex; align-items:center; gap:14px;
+    background:linear-gradient(135deg, rgba(63,110,147,.1), rgba(63,110,147,.02));
+    border:1px solid var(--border);
+    border-radius:14px; padding:14px 16px;
+  }
+  .wod-label{ font-size:.72rem; color:var(--ice); margin-bottom:4px; }
+  .wod-main{ flex:1; }
+  .wod-ru{ font-family:'Aref Ruqaa', serif; font-size:1.3rem; color:var(--text); }
+  .wod-tr{ font-size:.74rem; color:var(--text-dim3); }
+  .wod-ar{ font-size:.85rem; color:var(--text-dim); margin-top:2px; }
+  .wod-play{
+    flex:none; width:38px; height:38px; border-radius:50%;
+    background:var(--surface2); border:1px solid var(--border); color:var(--text);
+    cursor:pointer; font-size:1rem;
+  }
+
   .continue-card{
     margin:22px 0 8px;
     background:linear-gradient(135deg, rgba(212,169,79,.14), rgba(212,169,79,.03));
@@ -96,6 +137,14 @@
     <h1>تعلم الروسية بالعربي</h1>
   </div>
 
+  <div class="mascot-box" id="mascotBox" onclick="ruWobbleMascot()">
+    <div class="mascot-svg-wrap" id="mascotSvg"></div>
+    <div class="stage" id="mascotStage">دميتك بتستنى تعلمك</div>
+    <div class="hint">دوس عليها، وتتفتح مع كل حروف جديدة تتعلمها</div>
+  </div>
+
+  <div class="wod-card" id="wodCard"></div>
+
   <a class="continue-card" id="continueCard" href="letters.html">
     <div class="glyph">А</div>
     <div class="txt">
@@ -120,7 +169,7 @@
     </a>
 
     <a class="node-link" href="letters.html">
-      <div class="node active">
+      <div class="node" id="lettersNode">
         <div class="side marker">🔤</div>
         <div class="side text">
           <h3>الحروف السيريلية</h3>
@@ -130,31 +179,31 @@
       </div>
     </a>
 
-    <a class="node-link" href="#" onclick="return false;">
-      <div class="node locked">
+    <a class="node-link" href="pronunciation.html">
+      <div class="node" id="pronNode">
         <div class="side marker">🗣️</div>
-        <div class="side text"><h3>النطق والتشديد</h3><p>قريباً</p></div>
+        <div class="side text"><h3>النطق والتشديد</h3><p id="pronNodeDesc">اتعلم القواعد الأساسية للنطق</p></div>
       </div>
     </a>
 
-    <a class="node-link" href="#" onclick="return false;">
-      <div class="node locked">
+    <a class="node-link" href="vocabulary.html">
+      <div class="node" id="vocabNode">
         <div class="side marker">📚</div>
-        <div class="side text"><h3>المفردات</h3><p>قريباً</p></div>
+        <div class="side text"><h3>المفردات</h3><p id="vocabNodeDesc">كلمات بمواضيع، بمراجعة ذكية SM-2</p></div>
       </div>
     </a>
 
-    <a class="node-link" href="#" onclick="return false;">
-      <div class="node locked">
+    <a class="node-link" href="grammar.html">
+      <div class="node" id="grammarNode">
         <div class="side marker">📖</div>
-        <div class="side text"><h3>القواعد الأساسية</h3><p>قريباً</p></div>
+        <div class="side text"><h3>القواعد الأساسية</h3><p id="grammarNodeDesc">الحالات النحوية وتصريف الأفعال</p></div>
       </div>
     </a>
 
-    <a class="node-link" href="#" onclick="return false;">
-      <div class="node locked">
+    <a class="node-link" href="phrases.html">
+      <div class="node" id="phrasesNode">
         <div class="side marker">💬</div>
-        <div class="side text"><h3>عبارات جاهزة</h3><p>قريباً</p></div>
+        <div class="side text"><h3>عبارات جاهزة</h3><p id="phrasesNodeDesc">سفر، دراسة، عمل، وتسوق</p></div>
       </div>
     </a>
 
@@ -176,6 +225,10 @@
     <span class="tab-icon">🔤</span>
     <span>الحروف</span>
   </a>
+  <a href="vocabulary.html">
+    <span class="tab-icon">📚</span>
+    <span>المفردات</span>
+  </a>
   <a class="disabled" href="#">
     <span class="tab-icon">🏅</span>
     <span>إنجازاتي</span>
@@ -185,14 +238,56 @@
 
 <script src="progress.js"></script>
 <script src="theme.js"></script>
+<script src="matryoshka.js"></script>
+<script src="wordoftheday.js"></script>
 <script>
   const s = RuProgress.getState();
   document.getElementById("streakNum").textContent = s.streak;
   document.getElementById("xpNum").textContent = s.xp;
   document.getElementById("levelNum").textContent = s.level;
 
+  ruRenderMatryoshka("mascotSvg", "mascotStage");
+  ruRenderWordOfDay("wodCard");
+  function ruWobbleMascot(){
+    const box = document.getElementById("mascotBox");
+    box.classList.remove("wobble");
+    void box.offsetWidth; // إعادة تشغيل الأنيميشن
+    box.classList.add("wobble");
+  }
+
   const learnedCount = Object.values(s.letters || {}).filter(l => l.learned).length;
   document.getElementById("lettersBadge").textContent = learnedCount + " / 33 اتعلمت";
+  document.getElementById("lettersNode").classList.add(learnedCount >= 33 ? "done" : "active");
+
+  const pronDone = s.sections && s.sections.pronunciation;
+  const pronNode = document.getElementById("pronNode");
+  if (pronDone) {
+    pronNode.classList.add("done");
+    document.getElementById("pronNodeDesc").textContent = "خلصته ✓ — تقدر تراجعه";
+  } else {
+    pronNode.classList.add("active");
+  }
+
+  const vocabLearned = Object.values(s.vocab || {}).filter(c => c.repetition > 0).length;
+  document.getElementById("vocabNode").classList.add("active");
+  if (vocabLearned > 0) {
+    document.getElementById("vocabNodeDesc").textContent = vocabLearned + " كلمة بدأت مراجعتها";
+  }
+
+  const grammarDone = s.sections && s.sections.grammar;
+  const grammarNode = document.getElementById("grammarNode");
+  if (grammarDone) {
+    grammarNode.classList.add("done");
+    document.getElementById("grammarNodeDesc").textContent = "خلصته ✓ — تقدر تراجعه";
+  } else {
+    grammarNode.classList.add("active");
+  }
+
+  const phrasesSavedCount = Object.keys(s.phrases || {}).length;
+  document.getElementById("phrasesNode").classList.add("active");
+  if (phrasesSavedCount > 0) {
+    document.getElementById("phrasesNodeDesc").textContent = phrasesSavedCount + " عبارة محفوظة";
+  }
 
   if (learnedCount > 0 && learnedCount < 33) {
     document.querySelector("#continueCard .txt p").textContent = "كمّل — باقيلك " + (33 - learnedCount) + " حرف";

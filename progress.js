@@ -21,7 +21,8 @@ const RuProgress = (function () {
         lastActiveDate: null,
         badges: [],
         letters: {},   // { "А": { learned: true, written: true } }
-        vocab: {}      // reserved for future SM-2 vocabulary section
+        vocab: {},     // reserved for future SM-2 vocabulary section
+        sections: {}   // { pronunciation: true, ... } generic section-complete flags
       };
     }
     try { return JSON.parse(raw); }
@@ -92,8 +93,27 @@ const RuProgress = (function () {
     return state;
   }
 
+  function markSectionComplete(sectionId) {
+    const state = load();
+    if (!state.sections) state.sections = {};
+    state.sections[sectionId] = true;
+    save(state);
+    return state;
+  }
+
+  function saveVocabCard(wordId, cardData) {
+    const state = load();
+    if (!state.vocab) state.vocab = {};
+    state.vocab[wordId] = cardData;
+    save(state);
+    return state;
+  }
+
   function getState() {
-    return load();
+    const s = load();
+    if (!s.sections) s.sections = {};
+    if (!s.vocab) s.vocab = {};
+    return s;
   }
 
   return {
@@ -101,6 +121,8 @@ const RuProgress = (function () {
     markLetterLearned,
     markLetterWritten,
     awardBadge,
+    markSectionComplete,
+    saveVocabCard,
     getState,
     levelForXp
   };

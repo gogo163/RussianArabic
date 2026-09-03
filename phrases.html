@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>عبارات جاهزة — تعلم الروسية بالعربي</title>
+<script>
+  (function(){
+    var t = localStorage.getItem("ru_arabi_theme");
+    if (t === "dark") document.documentElement.setAttribute("data-theme", "dark");
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .page-head{ padding:28px 0 8px; text-align:center; }
+  .page-head h1{ font-size:2rem; color:var(--gold-soft); margin-bottom:8px; }
+  .page-head p{ color:var(--text-dim2); font-size:.95rem; }
+
+  .scenario-tabs{ display:flex; gap:8px; padding:20px 0 4px; overflow-x:auto; }
+  .scenario-tabs button{
+    flex:none; font-family:'Tajawal', sans-serif; font-size:.86rem; font-weight:700;
+    color:var(--text); background:transparent; border:1px solid var(--border);
+    padding:9px 16px; border-radius:20px; cursor:pointer; white-space:nowrap;
+    display:flex; align-items:center; gap:6px;
+  }
+  .scenario-tabs button.active{ background:var(--gold); color:var(--on-accent); border-color:var(--gold); }
+
+  .phrase-list{ display:flex; flex-direction:column; gap:12px; padding:20px 0 40px; }
+  .phrase-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:14px 16px;
+  }
+  .phrase-card.learned{ border-color:var(--green); }
+  .phrase-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+  .phrase-ru{ font-family:'Aref Ruqaa', serif; font-size:1.2rem; color:var(--text); }
+  .phrase-tr{ font-size:.74rem; color:var(--text-dim4); margin-top:2px; }
+  .phrase-ar{ font-size:.88rem; color:var(--gold-soft); margin-top:6px; }
+  .phrase-actions{ display:flex; gap:8px; flex:none; }
+  .phrase-actions button{
+    width:34px; height:34px; border-radius:50%; border:1px solid var(--border);
+    background:var(--surface2); color:var(--text); cursor:pointer; font-size:.9rem;
+  }
+  .phrase-actions button.mark.on{ background:var(--green); border-color:var(--green); color:#fff; }
+
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+    background:var(--gold); color:var(--on-accent); font-weight:800;
+    padding:10px 22px; border-radius:20px; font-size:.9rem;
+    opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease;
+    z-index:10;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+
+<div class="app-header">
+  <a class="icon-circle" href="index.html" aria-label="الرئيسية">←</a>
+  <div class="stats" id="statsBar"></div>
+  <button class="theme-toggle" id="themeToggleBtn" onclick="ruToggleTheme()" aria-label="تبديل الوضع الليلي">🌙</button>
+</div>
+
+<div class="wrap has-bottom-nav">
+  <div class="page-head">
+    <h1>عبارات جاهزة</h1>
+    <p>جمل كاملة تقدر تستخدمها فوراً — مقسمة حسب الموقف</p>
+  </div>
+
+  <div class="scenario-tabs" id="scenarioTabs"></div>
+  <div class="phrase-list" id="phraseList"></div>
+</div>
+
+<nav class="bottom-nav">
+  <a href="index.html"><span class="tab-icon">🏠</span><span>الرئيسية</span></a>
+  <a href="letters.html"><span class="tab-icon">🔤</span><span>الحروف</span></a>
+  <a href="vocabulary.html"><span class="tab-icon">📚</span><span>المفردات</span></a>
+  <a class="disabled" href="#"><span class="tab-icon">🏅</span><span>إنجازاتي</span><span class="dot"></span></a>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script src="progress.js"></script>
+<script src="theme.js"></script>
+<script>
+ruRenderStatsBar("statsBar");
+
+const SCENARIOS = [
+  {
+    id:"travel", title:"سفر", icon:"✈️",
+    phrases:[
+      { id:"t1", ru:"Где находится вокзал?", tr:"gde nakhóditsya vokzál?", ar:"فين المحطة؟" },
+      { id:"t2", ru:"Сколько это стоит?", tr:"skól'ko éto stóit?", ar:"ده بكام؟" },
+      { id:"t3", ru:"Мне нужно такси", tr:"mne núzhno taksí", ar:"محتاج تاكسي" },
+      { id:"t4", ru:"Где я могу купить билет?", tr:"gde ya mogú kupít' bilét?", ar:"أشتري التذكرة منين؟" },
+      { id:"t5", ru:"Помогите, пожалуйста", tr:"pomogíte, pozháluysta", ar:"ساعدني من فضلك" },
+      { id:"t6", ru:"Я не понимаю", tr:"ya ne ponimáyu", ar:"أنا مش فاهم" }
+    ]
+  },
+  {
+    id:"study", title:"دراسة", icon:"🎓",
+    phrases:[
+      { id:"s1", ru:"Как это сказать по-русски?", tr:"kak éto skazát' po-rússki?", ar:"إزاي أقول ده بالروسي؟" },
+      { id:"s2", ru:"Повторите, пожалуйста", tr:"povtoríte, pozháluysta", ar:"كرر من فضلك" },
+      { id:"s3", ru:"Я изучаю русский язык", tr:"ya izucháyu rússkiy yazýk", ar:"أنا بدرس اللغة الروسية" },
+      { id:"s4", ru:"Можно медленнее?", tr:"mózhno médlenneye?", ar:"ممكن أبطأ؟" },
+      { id:"s5", ru:"Где находится университет?", tr:"gde nakhóditsya universitét?", ar:"فين الجامعة؟" },
+      { id:"s6", ru:"Мне нужна справка", tr:"mne nuzhná správka", ar:"محتاج شهادة/إفادة" }
+    ]
+  },
+  {
+    id:"work", title:"عمل", icon:"💼",
+    phrases:[
+      { id:"w1", ru:"Приятно познакомиться", tr:"priyátno poznakómit'sya", ar:"فرصة سعيدة" },
+      { id:"w2", ru:"Как вас зовут?", tr:"kak vas zovút?", ar:"اسم حضرتك إيه؟" },
+      { id:"w3", ru:"Меня зовут...", tr:"menyá zovút...", ar:"اسمي..." },
+      { id:"w4", ru:"У меня есть вопрос", tr:"u menyá yest' voprós", ar:"عندي سؤال" },
+      { id:"w5", ru:"Когда встреча?", tr:"kogdá vstrécha?", ar:"الاجتماع إمتى؟" },
+      { id:"w6", ru:"Спасибо за помощь", tr:"spasíbo za pómoshch'", ar:"شكراً على المساعدة" }
+    ]
+  },
+  {
+    id:"shopping", title:"تسوق", icon:"🛍️",
+    phrases:[
+      { id:"sh1", ru:"У вас есть...?", tr:"u vas yest'...?", ar:"عندكم...؟" },
+      { id:"sh2", ru:"Можно посмотреть?", tr:"mózhno posmotrét'?", ar:"ممكن أشوف؟" },
+      { id:"sh3", ru:"Это слишком дорого", tr:"éto slíshkom dórogo", ar:"ده غالي أوي" },
+      { id:"sh4", ru:"Я просто смотрю", tr:"ya prósto smotryú", ar:"أنا بس بتفرج" },
+      { id:"sh5", ru:"Можно карту?", tr:"mózhno kártu?", ar:"ممكن أدفع بالكارت؟" }
+    ]
+  }
+];
+
+let activeScenario = SCENARIOS[0].id;
+
+function renderTabs(){
+  const el = document.getElementById("scenarioTabs");
+  el.innerHTML = SCENARIOS.map(s => `
+    <button class="${s.id === activeScenario ? 'active' : ''}" onclick="selectScenario('${s.id}')">
+      ${s.icon} ${s.title}
+    </button>
+  `).join("");
+}
+
+function selectScenario(id){
+  activeScenario = id;
+  renderTabs();
+  renderPhrases();
+}
+
+function renderPhrases(){
+  const state = RuProgress.getState();
+  const scenario = SCENARIOS.find(s => s.id === activeScenario);
+  const el = document.getElementById("phraseList");
+  el.innerHTML = scenario.phrases.map(p => {
+    const learned = !!state.phrases[p.id];
+    return `
+    <div class="phrase-card ${learned ? 'learned' : ''}">
+      <div class="phrase-top">
+        <div>
+          <div class="phrase-ru">${p.ru}</div>
+          <div class="phrase-tr">${p.tr}</div>
+          <div class="phrase-ar">${p.ar}</div>
+        </div>
+        <div class="phrase-actions">
+          <button onclick="ruSpeak('${p.ru.replace(/'/g, "\\'")}')">🔊</button>
+          <button class="mark ${learned ? 'on' : ''}" onclick="togglePhrase('${p.id}')">✓</button>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function ruSpeak(text){
+  try {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "ru-RU"; u.rate = 0.85;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  } catch(e) { console.warn(e); }
+}
+
+function togglePhrase(id){
+  const state = RuProgress.getState();
+  const wasLearned = !!state.phrases[id];
+  if (!wasLearned) {
+    RuProgress.markPhraseLearned(id);
+    RuProgress.addXp(8, "phrase_learned");
+    ruRenderStatsBar("statsBar");
+    showToast("+8 XP — عبارة جديدة اتحفظت 🎉");
+  }
+  renderPhrases();
+}
+
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2000);
+}
+
+renderTabs();
+renderPhrases();
+</script>
+</body>
+</html>

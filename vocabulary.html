@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>المفردات — تعلم الروسية بالعربي</title>
+<script>
+  (function(){
+    var t = localStorage.getItem("ru_arabi_theme");
+    if (t === "dark") document.documentElement.setAttribute("data-theme", "dark");
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .page-head{ padding:28px 0 8px; text-align:center; }
+  .page-head h1{ font-size:2rem; color:var(--gold-soft); margin-bottom:8px; }
+  .page-head p{ color:var(--text-dim2); font-size:.95rem; }
+
+  .review-cta{
+    margin:20px 0; display:flex; align-items:center; justify-content:space-between; gap:14px;
+    background:linear-gradient(135deg, rgba(212,169,79,.14), rgba(212,169,79,.03));
+    border:1px solid rgba(212,169,79,.35);
+    border-radius:14px; padding:16px 18px;
+  }
+  .review-cta .txt h3{ font-size:1rem; color:var(--text); margin-bottom:3px; }
+  .review-cta .txt p{ font-size:.82rem; color:var(--text-dim3); }
+  .review-cta button{
+    flex:none; font-family:'Tajawal',sans-serif; font-weight:800; font-size:.9rem;
+    color:var(--on-accent); background:linear-gradient(135deg, var(--gold-soft), var(--gold));
+    border:none; padding:11px 22px; border-radius:20px; cursor:pointer;
+  }
+
+  .cat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:20px 0; }
+  .cat-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:16px; cursor:pointer; text-align:center;
+  }
+  .cat-card.active{ border-color:var(--gold); }
+  .cat-card .icon{ font-size:1.5rem; margin-bottom:6px; display:block; }
+  .cat-card h3{ font-size:.92rem; color:var(--text); margin-bottom:3px; }
+  .cat-card .cnt{ font-size:.72rem; color:var(--text-dim3); }
+
+  .word-list{ display:flex; flex-direction:column; gap:10px; padding-bottom:30px; }
+  .word-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:8px; padding:12px 16px;
+  }
+  .word-row .ru{ font-family:'Aref Ruqaa', serif; font-size:1.2rem; color:var(--text); }
+  .word-row .tr{ font-size:.72rem; color:var(--text-dim4); }
+  .word-row .ar{ font-size:.8rem; color:var(--text-dim3); margin-top:2px; }
+  .word-row .play{
+    flex:none; width:36px; height:36px; border-radius:50%;
+    background:var(--surface2); border:1px solid var(--border); color:var(--text);
+    cursor:pointer; font-size:.95rem;
+  }
+  .word-row.mastered{ border-color:var(--green); }
+  .word-row .mastered-tag{ font-size:.68rem; color:var(--green); }
+
+  /* ---- session overlay ---- */
+  .session{
+    display:none;
+    position:fixed; inset:0; z-index:20;
+    background:var(--bg-deep);
+    flex-direction:column;
+  }
+  .session.open{ display:flex; }
+  .session-top{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 20px;
+  }
+  .session-top .close{ background:none; border:none; color:var(--text-dim3); font-size:1.3rem; cursor:pointer; }
+  .session-progress{
+    flex:1; margin:0 16px; height:6px; background:var(--surface); border-radius:3px; overflow:hidden;
+  }
+  .session-progress-bar{ height:100%; background:var(--gold); width:0%; transition:width .3s ease; }
+
+  .session-body{
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:20px; text-align:center;
+  }
+  .flash-ru{ font-family:'Aref Ruqaa', serif; font-size:2.6rem; color:var(--text); margin-bottom:10px; }
+  .flash-tr{ font-size:.9rem; color:var(--text-dim3); margin-bottom:22px; }
+  .flash-ar{ font-size:1.4rem; color:var(--gold-soft); margin-bottom:22px; display:none; }
+  .flash-ar.shown{ display:block; }
+
+  .flip-btn{
+    background:var(--surface2); border:1px solid var(--border); color:var(--text);
+    padding:12px 28px; border-radius:20px; cursor:pointer; font-family:'Tajawal',sans-serif; font-size:.95rem;
+  }
+  .quality-row{ display:none; gap:8px; margin-top:10px; flex-wrap:wrap; justify-content:center; }
+  .quality-row.shown{ display:flex; }
+  .quality-row button{
+    font-family:'Tajawal',sans-serif; font-size:.82rem; font-weight:700;
+    padding:11px 16px; border-radius:14px; border:none; cursor:pointer; color:var(--on-accent);
+  }
+  .q-again{ background:#c15a52; }
+  .q-hard{ background:#c99a52; }
+  .q-good{ background:#6fae82; }
+  .q-easy{ background:var(--gold); }
+
+  .session-done{ text-align:center; }
+  .session-done .big{ font-size:2.2rem; margin-bottom:12px; }
+  .session-done p{ color:var(--text-dim2); margin-bottom:20px; }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+
+<div class="app-header">
+  <a class="icon-circle" href="index.html" aria-label="الرئيسية">←</a>
+  <div class="stats" id="statsBar"></div>
+  <button class="theme-toggle" id="themeToggleBtn" onclick="ruToggleTheme()" aria-label="تبديل الوضع الليلي">🌙</button>
+</div>
+
+<div class="wrap has-bottom-nav">
+  <div class="page-head">
+    <h1>المفردات</h1>
+    <p>كلمات مقسمة بمواضيع، بنظام مراجعة ذكي بيفكرك بس باللي محتاج مراجعة</p>
+  </div>
+
+  <div class="review-cta">
+    <div class="txt">
+      <h3 id="dueCount">جاهز للمراجعة</h3>
+      <p>كلمات محتاجة تراجعها دلوقتي</p>
+    </div>
+    <button onclick="startSession()">ابدأ المراجعة</button>
+  </div>
+
+  <div class="cat-grid" id="catGrid"></div>
+  <div class="word-list" id="wordList"></div>
+</div>
+
+<nav class="bottom-nav">
+  <a href="index.html"><span class="tab-icon">🏠</span><span>الرئيسية</span></a>
+  <a href="letters.html"><span class="tab-icon">🔤</span><span>الحروف</span></a>
+  <a class="active" href="vocabulary.html"><span class="tab-icon">📚</span><span>المفردات</span></a>
+  <a class="disabled" href="#"><span class="tab-icon">🏅</span><span>إنجازاتي</span><span class="dot"></span></a>
+</nav>
+
+<!-- ---- جلسة المراجعة ---- -->
+<div class="session" id="session">
+  <div class="session-top">
+    <button class="close" onclick="closeSession()">✕</button>
+    <div class="session-progress"><div class="session-progress-bar" id="sessionBar"></div></div>
+    <span style="font-size:.8rem; color:var(--text-dim3);" id="sessionCount">0/0</span>
+  </div>
+  <div class="session-body" id="sessionBody"></div>
+</div>
+
+<script src="progress.js"></script>
+<script src="theme.js"></script>
+<script src="vocab.js"></script>
+<script>
+ruRenderStatsBar("statsBar");
+
+let activeCat = null; // null = كل الكلمات
+
+function renderCategories(){
+  const state = RuProgress.getState();
+  const grid = document.getElementById("catGrid");
+  grid.innerHTML = "";
+
+  const allCard = document.createElement("div");
+  allCard.className = "cat-card" + (activeCat === null ? " active" : "");
+  allCard.innerHTML = `<span class="icon">📚</span><h3>كل الكلمات</h3><span class="cnt">${ruAllVocabWords().length} كلمة</span>`;
+  allCard.onclick = () => { activeCat = null; renderCategories(); renderWords(); };
+  grid.appendChild(allCard);
+
+  VOCAB_CATEGORIES.forEach(cat => {
+    const learnedInCat = cat.words.filter(w => state.vocab[w.id] && state.vocab[w.id].repetition > 0).length;
+    const card = document.createElement("div");
+    card.className = "cat-card" + (activeCat === cat.id ? " active" : "");
+    card.innerHTML = `<span class="icon">${cat.icon}</span><h3>${cat.title}</h3><span class="cnt">${learnedInCat} / ${cat.words.length} اتراجعت</span>`;
+    card.onclick = () => { activeCat = cat.id; renderCategories(); renderWords(); };
+    grid.appendChild(card);
+  });
+}
+
+function renderWords(){
+  const state = RuProgress.getState();
+  const list = document.getElementById("wordList");
+  const words = activeCat === null ? ruAllVocabWords() : VOCAB_CATEGORIES.find(c => c.id === activeCat).words;
+
+  list.innerHTML = words.map(w => {
+    const card = state.vocab[w.id];
+    const mastered = card && card.repetition >= 3;
+    return `
+    <div class="word-row ${mastered ? 'mastered' : ''}">
+      <button class="play" onclick="ruSpeakVocab('${w.ru}')">🔊</button>
+      <div style="flex:1; text-align:right;">
+        <div class="ru">${w.ru} <span class="tr">${w.tr}</span></div>
+        <div class="ar">${w.ar}</div>
+      </div>
+      ${mastered ? '<span class="mastered-tag">✓ متقن</span>' : ''}
+    </div>`;
+  }).join("");
+}
+
+function ruSpeakVocab(text){
+  try {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "ru-RU"; u.rate = 0.85;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  } catch(e) { console.warn(e); }
+}
+
+function refreshDueCount(){
+  const due = ruDueVocabWords(999);
+  document.getElementById("dueCount").textContent = due.length > 0
+    ? due.length + " كلمة جاهزة للمراجعة"
+    : "مفيش كلمات مستحقة دلوقتي 🎉";
+}
+
+renderCategories();
+renderWords();
+refreshDueCount();
+
+/* ===================== جلسة المراجعة (SM-2) ===================== */
+let sessionWords = [];
+let sessionIdx = 0;
+let sessionCorrect = 0;
+
+function startSession(){
+  sessionWords = ruDueVocabWords(10);
+  if (sessionWords.length === 0) {
+    // مفيش كلمات مستحقة، هات كلمات جديدة لسه ما اتراجعتش خالص
+    const state = RuProgress.getState();
+    sessionWords = ruAllVocabWords().filter(w => !state.vocab[w.id]).slice(0, 8);
+  }
+  if (sessionWords.length === 0) { refreshDueCount(); return; }
+  sessionIdx = 0;
+  sessionCorrect = 0;
+  document.getElementById("session").classList.add("open");
+  renderCard();
+}
+
+function closeSession(){
+  document.getElementById("session").classList.remove("open");
+  renderCategories(); renderWords(); refreshDueCount(); ruRenderStatsBar("statsBar");
+}
+
+function renderCard(){
+  const total = sessionWords.length;
+  document.getElementById("sessionCount").textContent = (sessionIdx+1) + "/" + total;
+  document.getElementById("sessionBar").style.width = Math.round((sessionIdx/total)*100) + "%";
+
+  if (sessionIdx >= total) { renderSessionDone(); return; }
+  const w = sessionWords[sessionIdx];
+  const body = document.getElementById("sessionBody");
+  body.innerHTML = `
+    <div class="flash-ru">${w.ru}</div>
+    <div class="flash-tr">${w.tr}</div>
+    <div class="flash-ar" id="flashAr">${w.ar}</div>
+    <button class="flip-btn" id="flipBtn" onclick="revealMeaning()">🔊 اسمع / اظهر المعنى</button>
+    <div class="quality-row" id="qualityRow">
+      <button class="q-again" onclick="answerCard(1)">مش فاكر</button>
+      <button class="q-hard" onclick="answerCard(3)">صعب</button>
+      <button class="q-good" onclick="answerCard(4)">كويس</button>
+      <button class="q-easy" onclick="answerCard(5)">سهل</button>
+    </div>
+  `;
+  ruSpeakVocab(w.ru);
+}
+
+function revealMeaning(){
+  document.getElementById("flashAr").classList.add("shown");
+  document.getElementById("flipBtn").style.display = "none";
+  document.getElementById("qualityRow").classList.add("shown");
+}
+
+function answerCard(quality){
+  const w = sessionWords[sessionIdx];
+  const state = RuProgress.getState();
+  const existing = state.vocab[w.id];
+  const updated = ruSm2Schedule(existing, quality);
+  RuProgress.saveVocabCard(w.id, updated);
+
+  if (quality >= 3) {
+    sessionCorrect++;
+    RuProgress.addXp(5, "vocab_review");
+  }
+  sessionIdx++;
+  renderCard();
+}
+
+function renderSessionDone(){
+  document.getElementById("sessionBar").style.width = "100%";
+  const body = document.getElementById("sessionBody");
+  body.innerHTML = `
+    <div class="session-done">
+      <div class="big">🎉</div>
+      <h3 style="color:var(--gold-soft); margin-bottom:8px;">خلصت الجلسة!</h3>
+      <p>راجعت ${sessionWords.length} كلمة، ${sessionCorrect} منهم عرفتها صح — +${sessionCorrect*5} XP</p>
+      <button class="cta" onclick="closeSession()">تمام</button>
+    </div>
+  `;
+}
+</script>
+</body>
+</html>
