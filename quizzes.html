@@ -122,17 +122,12 @@
 
 <script src="progress.js"></script>
 <script src="theme.js"></script>
+<script src="audio.js"></script>
 <script src="vocab.js"></script>
 <script>
 ruRenderStatsBar("statsBar");
 
-function ruSpeak(text){
-  try {
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = "ru-RU"; u.rate = 0.85;
-    speechSynthesis.cancel(); speechSynthesis.speak(u);
-  } catch(e) { console.warn(e); }
-}
+function ruSpeak(text){ ruPlayAudio(text); }
 
 function shuffle(arr){
   const a = [...arr];

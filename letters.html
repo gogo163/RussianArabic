@@ -177,6 +177,7 @@
 
 <script src="progress.js"></script>
 <script src="theme.js"></script>
+<script src="audio.js"></script>
 <script src="matryoshka.js"></script>
 <script>
 /* ===================== بيانات الحروف ===================== */
@@ -298,15 +299,7 @@ document.getElementById("closePractice").onclick = closePractice;
 
 document.getElementById("playSound").onclick = () => {
   if (!activeLetter) return;
-  // نظام صوت هجين: هنا Web Speech API كـ fallback فوري.
-  // لاحقاً هيتم استبداله بملفات WAV مسجلة مسبقاً (Balabolka/SAPI5) زي باقي التطبيقات.
-  try {
-    const utter = new SpeechSynthesisUtterance(activeLetter.l);
-    utter.lang = "ru-RU";
-    utter.rate = 0.8;
-    speechSynthesis.cancel();
-    speechSynthesis.speak(utter);
-  } catch(e) { console.warn("Speech synthesis not available", e); }
+  ruPlayAudio(activeLetter.l, 0.8);
 };
 
 document.getElementById("markLearned").onclick = () => {

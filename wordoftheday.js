@@ -62,10 +62,4 @@ function ruRenderWordOfDay(containerId){
   `;
 }
 
-function ruSpeakWord(text){
-  try {
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = "ru-RU"; u.rate = 0.85;
-    speechSynthesis.cancel(); speechSynthesis.speak(u);
-  } catch(e) { console.warn(e); }
-}
+function ruSpeakWord(text){ ruPlayAudio(text); }

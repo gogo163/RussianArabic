@@ -148,6 +148,7 @@
 
 <script src="progress.js"></script>
 <script src="theme.js"></script>
+<script src="audio.js"></script>
 <script>
 ruRenderStatsBar("statsBar");
 
@@ -159,13 +160,7 @@ const PRACTICE_WORDS = [
   { word:"учит<span class='stressed'>е</span>ль",  ru:"учитель",  meaning:"مُدرِّس" }
 ];
 
-function ruSpeak(text){
-  try {
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = "ru-RU"; u.rate = 0.85;
-    speechSynthesis.cancel(); speechSynthesis.speak(u);
-  } catch(e) { console.warn(e); }
-}
+function ruSpeak(text){ ruPlayAudio(text); }
 
 function renderPractice(){
   const list = document.getElementById("practiceList");
