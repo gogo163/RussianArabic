@@ -207,10 +207,10 @@
       </div>
     </a>
 
-    <a class="node-link" href="#" onclick="return false;">
-      <div class="node locked">
+    <a class="node-link" href="quizzes.html">
+      <div class="node" id="quizzesNode">
         <div class="side marker">📝</div>
-        <div class="side text"><h3>اختبارات ومراجعة</h3><p>قريباً</p></div>
+        <div class="side text"><h3>اختبارات ومراجعة</h3><p id="quizzesNodeDesc">اختبار مختلط من كل الأقسام</p></div>
       </div>
     </a>
   </div>
@@ -287,6 +287,12 @@
   document.getElementById("phrasesNode").classList.add("active");
   if (phrasesSavedCount > 0) {
     document.getElementById("phrasesNodeDesc").textContent = phrasesSavedCount + " عبارة محفوظة";
+  }
+
+  const quizBest = s.sections && s.sections.quizBest;
+  document.getElementById("quizzesNode").classList.add("active");
+  if (quizBest) {
+    document.getElementById("quizzesNodeDesc").textContent = "أفضل نتيجة: " + quizBest + "%";
   }
 
   if (learnedCount > 0 && learnedCount < 33) {
