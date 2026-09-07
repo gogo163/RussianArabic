@@ -22,7 +22,8 @@ const RuProgress = (function () {
         badges: [],
         letters: {},   // { "А": { learned: true, written: true } }
         vocab: {},     // reserved for future SM-2 vocabulary section
-        sections: {}   // { pronunciation: true, ... } generic section-complete flags
+        sections: {},  // { pronunciation: true, ... } generic section-complete flags
+        phrases: {}    // { phraseId: { learned: true } }
       };
     }
     try { return JSON.parse(raw); }
@@ -81,6 +82,15 @@ const RuProgress = (function () {
     return state;
   }
 
+  function markPhraseLearned(phraseId) {
+    const state = load();
+    if (!state.phrases) state.phrases = {};
+    const already = !!(state.phrases[phraseId] && state.phrases[phraseId].learned);
+    state.phrases[phraseId] = { learned: true };
+    save(state);
+    return { state, already };
+  }
+
   function awardBadge(badgeId) {
     const state = load();
     if (!state.badges.includes(badgeId)) {
@@ -113,6 +123,7 @@ const RuProgress = (function () {
     const s = load();
     if (!s.sections) s.sections = {};
     if (!s.vocab) s.vocab = {};
+    if (!s.phrases) s.phrases = {};
     return s;
   }
 
@@ -120,6 +131,7 @@ const RuProgress = (function () {
     addXp,
     markLetterLearned,
     markLetterWritten,
+    markPhraseLearned,
     awardBadge,
     markSectionComplete,
     saveVocabCard,
