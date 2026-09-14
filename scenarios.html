@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سيناريوهات تفاعلية — تعلم الروسية بالعربي</title>
+<script>
+  (function(){
+    var t = localStorage.getItem("ru_arabi_theme");
+    if (t === "dark") document.documentElement.setAttribute("data-theme", "dark");
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .page-head{ padding:28px 0 8px; text-align:center; }
+  .page-head h1{ font-size:2rem; color:var(--gold-soft); margin-bottom:8px; }
+  .page-head p{ color:var(--text-dim2); font-size:.95rem; }
+
+  .scenario-grid{ display:flex; flex-direction:column; gap:12px; padding:20px 0 30px; }
+  .scenario-card{
+    display:flex; align-items:center; gap:14px;
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:16px 18px; cursor:pointer;
+  }
+  .scenario-card .icon{ font-size:1.8rem; flex:none; }
+  .scenario-card h3{ font-size:1.05rem; color:var(--text); margin-bottom:3px; }
+  .scenario-card p{ font-size:.8rem; color:var(--text-dim3); }
+  .scenario-card .go{ margin-right:auto; color:var(--gold-soft); font-size:1.1rem; }
+
+  /* ---- conversation view ---- */
+  .convo{ display:none; padding:20px 0 40px; }
+  .convo.open{ display:block; }
+  .convo-top{ display:flex; align-items:center; gap:10px; margin-bottom:20px; }
+  .convo-top button{ background:none; border:none; color:var(--text-dim3); font-size:1rem; cursor:pointer; }
+  .convo-top h2{ font-size:1.1rem; color:var(--gold-soft); }
+
+  .bubble-row{ display:flex; margin-bottom:16px; }
+  .bubble{
+    max-width:82%; padding:12px 16px; border-radius:14px;
+    background:var(--surface); border:1px solid var(--border);
+  }
+  .bubble .ru{ font-family:'Aref Ruqaa', serif; font-size:1.1rem; color:var(--text); margin-bottom:4px; }
+  .bubble .ar{ font-size:.82rem; color:var(--text-dim3); }
+  .bubble .play{
+    background:none; border:none; color:var(--gold-soft); font-size:.9rem; cursor:pointer; margin-left:6px;
+  }
+  .bubble.end{ text-align:center; background:linear-gradient(135deg, rgba(212,169,79,.14), rgba(212,169,79,.03)); border-color:rgba(212,169,79,.35); }
+  .bubble.end .ar{ font-size:1.05rem; color:var(--gold-soft); }
+
+  .choices{ display:flex; flex-direction:column; gap:8px; margin-top:6px; }
+  .choice-btn{
+    text-align:right; font-family:'Tajawal',sans-serif; font-size:.92rem;
+    background:var(--surface2); border:1px solid var(--border); color:var(--text);
+    padding:12px 16px; border-radius:10px; cursor:pointer;
+  }
+  .choice-btn .ru{ font-family:'Aref Ruqaa', serif; font-size:1rem; }
+  .choice-btn .ar{ font-size:.76rem; color:var(--text-dim3); display:block; margin-top:2px; }
+  .choice-btn:active{ transform:scale(.98); }
+
+  .feedback{ font-size:.78rem; margin-top:6px; padding-right:4px; }
+  .feedback.good{ color:var(--green); }
+  .feedback.meh{ color:var(--brick); }
+
+  .end-actions{ display:flex; gap:10px; justify-content:center; margin-top:20px; }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+
+<div class="app-header">
+  <a class="icon-circle" href="index.html" aria-label="الرئيسية">←</a>
+  <div class="stats" id="statsBar"></div>
+  <button class="theme-toggle" id="themeToggleBtn" onclick="ruToggleTheme()" aria-label="تبديل الوضع الليلي">🌙</button>
+</div>
+
+<div class="wrap has-bottom-nav">
+  <div class="page-head" id="pageHead">
+    <h1>سيناريوهات تفاعلية</h1>
+    <p>اختار موقف وعيشه — ردودك بتفرق في مسار المحادثة</p>
+  </div>
+
+  <div class="scenario-grid" id="scenarioGrid"></div>
+
+  <div class="convo" id="convo">
+    <div class="convo-top">
+      <button onclick="exitScenario()">✕</button>
+      <h2 id="convoTitle"></h2>
+    </div>
+    <div id="convoBody"></div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <a href="index.html"><span class="tab-icon">🏠</span><span>الرئيسية</span></a>
+  <a href="letters.html"><span class="tab-icon">🔤</span><span>الحروف</span></a>
+  <a href="vocabulary.html"><span class="tab-icon">📚</span><span>المفردات</span></a>
+  <a class="disabled" href="#"><span class="tab-icon">🏅</span><span>إنجازاتي</span><span class="dot"></span></a>
+</nav>
+
+<script src="progress.js"></script>
+<script src="theme.js"></script>
+<script src="audio.js"></script>
+<script src="scenarios.js"></script>
+<script>
+ruRenderStatsBar("statsBar");
+
+let activeScenario = null;
+let currentNodeId = null;
+let goodCount = 0;
+let totalChoices = 0;
+
+function renderGrid(){
+  const grid = document.getElementById("scenarioGrid");
+  grid.innerHTML = SCENARIOS.map(s => `
+    <div class="scenario-card" onclick="openScenario('${s.id}')">
+      <span class="icon">${s.icon}</span>
+      <div>
+        <h3>${s.title}</h3>
+        <p>${s.intro}</p>
+      </div>
+      <span class="go">←</span>
+    </div>
+  `).join("");
+}
+
+function openScenario(id){
+  activeScenario = SCENARIOS.find(s => s.id === id);
+  currentNodeId = activeScenario.start;
+  goodCount = 0;
+  totalChoices = 0;
+  document.getElementById("pageHead").style.display = "none";
+  document.getElementById("scenarioGrid").style.display = "none";
+  document.getElementById("convo").classList.add("open");
+  document.getElementById("convoTitle").textContent = activeScenario.icon + " " + activeScenario.title;
+  document.getElementById("convoBody").innerHTML = "";
+  renderNode();
+}
+
+function exitScenario(){
+  document.getElementById("pageHead").style.display = "";
+  document.getElementById("scenarioGrid").style.display = "";
+  document.getElementById("convo").classList.remove("open");
+  activeScenario = null;
+}
+
+function renderNode(){
+  const node = activeScenario.nodes[currentNodeId];
+  const body = document.getElementById("convoBody");
+
+  if (node.speaker === "end") {
+    const pct = totalChoices > 0 ? Math.round((goodCount/totalChoices)*100) : 100;
+    const xp = 15 + goodCount * 3;
+    RuProgress.addXp(xp, "scenario_completed");
+    const already = RuProgress.getState().sections.scenarios;
+    RuProgress.markSectionComplete("scenarios");
+    ruRenderStatsBar("statsBar");
+
+    body.innerHTML += `
+      <div class="bubble-row" style="justify-content:center;">
+        <div class="bubble end">
+          <div class="ar">${node.ar}</div>
+          <div style="font-size:.82rem; color:var(--text-dim3); margin-top:8px;">
+            ردودك المثالية: ${goodCount}/${totalChoices} — كسبت ${xp} XP
+          </div>
+          <div class="end-actions">
+            <button class="cta" onclick="openScenario('${activeScenario.id}')">جرب تاني</button>
+            <button class="btn-ghost" onclick="exitScenario()">رجوع</button>
+          </div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const npcId = "npc_" + Math.random().toString(36).slice(2,8);
+  body.innerHTML += `
+    <div class="bubble-row">
+      <div class="bubble">
+        <div class="ru">${node.ru} <button class="play" onclick="ruPlayAudio('${node.ru.replace(/'/g,"\\'")}')">🔊</button></div>
+        <div class="ar">${node.ar}</div>
+      </div>
+    </div>
+    <div class="choices" id="${npcId}"></div>
+  `;
+
+  const choicesEl = document.getElementById(npcId);
+  node.choices.forEach(choice => {
+    const btn = document.createElement("button");
+    btn.className = "choice-btn";
+    btn.innerHTML = `<span class="ru">${choice.text}</span><span class="ar">${choice.ar}</span>`;
+    btn.onclick = () => selectChoice(choice, choicesEl);
+    choicesEl.appendChild(btn);
+  });
+
+  document.getElementById("convo").scrollTop = document.getElementById("convo").scrollHeight;
+  window.scrollTo({ top: document.body.scrollHeight, behavior:"smooth" });
+}
+
+function selectChoice(choice, choicesEl){
+  totalChoices++;
+  if (choice.good) goodCount++;
+
+  // إضافة فقاعة رد المستخدم + تعليق سريع
+  choicesEl.outerHTML = `
+    <div class="bubble-row" style="justify-content:flex-end;">
+      <div class="bubble" style="background:rgba(212,169,79,.12); border-color:rgba(212,169,79,.3);">
+        <div class="ru">${choice.text}</div>
+        <div class="ar">${choice.ar}</div>
+        <div class="feedback ${choice.good ? 'good' : 'meh'}">${choice.good ? '✓ رد طبيعي' : '~ رد مفهوم بس مش أنسب حاجة'}</div>
+      </div>
+    </div>
+  `;
+
+  currentNodeId = choice.next;
+  setTimeout(renderNode, 500);
+}
+
+renderGrid();
+</script>
+</body>
+</html>

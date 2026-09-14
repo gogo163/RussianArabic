@@ -213,6 +213,13 @@
         <div class="side text"><h3>اختبارات ومراجعة</h3><p id="quizzesNodeDesc">اختبار مختلط من كل الأقسام</p></div>
       </div>
     </a>
+
+    <a class="node-link" href="scenarios.html">
+      <div class="node" id="scenariosNode">
+        <div class="side marker">🎭</div>
+        <div class="side text"><h3>سيناريوهات تفاعلية</h3><p id="scenariosNodeDesc">مطار، فندق، مقهى — بمحادثات متفرعة</p></div>
+      </div>
+    </a>
   </div>
 </div>
 
@@ -294,6 +301,11 @@
   document.getElementById("quizzesNode").classList.add("active");
   if (quizBest) {
     document.getElementById("quizzesNodeDesc").textContent = "أفضل نتيجة: " + quizBest + "%";
+  }
+
+  document.getElementById("scenariosNode").classList.add(s.sections && s.sections.scenarios ? "done" : "active");
+  if (s.sections && s.sections.scenarios) {
+    document.getElementById("scenariosNodeDesc").textContent = "جربتها ✓ — العب تاني";
   }
 
   if (learnedCount > 0 && learnedCount < 33) {
