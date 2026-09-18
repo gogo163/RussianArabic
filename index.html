@@ -221,7 +221,7 @@
       </div>
     </a>
 
-    <a class="node-link" href="speech-practice.html">
+    <a class="node-link" href="speech-practice.html" id="speechNodeLink">
       <div class="node" id="speechNode">
         <div class="side marker">🎤</div>
         <div class="side text"><h3>تدريب النطق</h3><p id="speechNodeDesc">قول الكلمة، وشوف تقييمك فوراً</p></div>
@@ -322,6 +322,18 @@
   } else if (learnedCount >= 33) {
     document.querySelector("#continueCard .eyebrow").textContent = "خلصت القسم ده! ✓";
     document.querySelector("#continueCard .txt p").textContent = "راجع أي حرف تحب";
+  }
+
+  // ------- جسر لفتح صفحة النطق في شاشة Kodular منفصلة (CustomWebView مع إذن المايك) -------
+  const speechLink = document.getElementById("speechNodeLink");
+  if (speechLink) {
+    speechLink.addEventListener("click", function (e) {
+      if (window.AppInventor) {
+        e.preventDefault();
+        window.AppInventor.setWebViewString("open_pronunciation");
+      }
+      // لو الصفحة اتفتحت في متصفح عادي (مش جوه التطبيق)، الرابط هيشتغل عادي زي أي لينك
+    });
   }
 </script>
 </body>
