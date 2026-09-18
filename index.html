@@ -220,6 +220,13 @@
         <div class="side text"><h3>سيناريوهات تفاعلية</h3><p id="scenariosNodeDesc">مطار، فندق، مقهى — بمحادثات متفرعة</p></div>
       </div>
     </a>
+
+    <a class="node-link" href="speech-practice.html">
+      <div class="node" id="speechNode">
+        <div class="side marker">🎤</div>
+        <div class="side text"><h3>تدريب النطق</h3><p id="speechNodeDesc">قول الكلمة، وشوف تقييمك فوراً</p></div>
+      </div>
+    </a>
   </div>
 </div>
 
@@ -307,6 +314,8 @@
   if (s.sections && s.sections.scenarios) {
     document.getElementById("scenariosNodeDesc").textContent = "جربتها ✓ — العب تاني";
   }
+
+  document.getElementById("speechNode").classList.add("active");
 
   if (learnedCount > 0 && learnedCount < 33) {
     document.querySelector("#continueCard .txt p").textContent = "كمّل — باقيلك " + (33 - learnedCount) + " حرف";
