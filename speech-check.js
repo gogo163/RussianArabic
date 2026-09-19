@@ -1,73 +1,64 @@
-/* ===== تعلم الروسية بالعربي — تتبع النطق (Web Speech Recognition) =====
-   نسخة مبسطة: بتسجل كلام المستخدم بمايك الجهاز، وتقارنه بالنص المطلوب
-   باستخدام خوارزمية Levenshtein للتشابه. مش تقييم نطق احترافي (زي ELSA)،
-   بس بيدي إحساس تفاعلي حقيقي ومجاني بالكامل.
+/* ===== تعلم الروسية بالعربي — تدريب النطق (تسجيل صوت + تقييم ذاتي) =====
+   نسخة تعتمد على MediaRecorder: بتسجل صوت المستخدم بمايك الجهاز،
+   بتشغّله له تاني، وهو اللي بيقيّم نطقه بنفسه بالمقارنة مع النطق الصحيح.
+   السبب: خاصية "تحويل الكلام لنص" (SpeechRecognition) متعطّلة عمدًا
+   داخل أي WebView جوه تطبيقات الموبايل (قيد من جوجل نفسها)، فبتشتغل
+   بس جوه متصفح مستقل زي Chrome. التسجيل والتشغيل (MediaRecorder) لأ،
+   بيشتغل عادي جوه التطبيق.
 */
 
-function ruSpeechSupported(){
-  return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
-}
-
-function ruLevenshtein(a, b){
-  a = a.toLowerCase().trim();
-  b = b.toLowerCase().trim();
-  const m = a.length, n = b.length;
-  const dp = Array.from({length: m+1}, () => new Array(n+1).fill(0));
-  for (let i=0;i<=m;i++) dp[i][0]=i;
-  for (let j=0;j<=n;j++) dp[0][j]=j;
-  for (let i=1;i<=m;i++){
-    for (let j=1;j<=n;j++){
-      if (a[i-1]===b[j-1]) dp[i][j]=dp[i-1][j-1];
-      else dp[i][j] = 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
-    }
-  }
-  return dp[m][n];
-}
-
-function ruSimilarity(target, said){
-  const dist = ruLevenshtein(target, said);
-  const maxLen = Math.max(target.length, said.length) || 1;
-  return Math.max(0, Math.round((1 - dist/maxLen) * 100));
+function ruMicSupported(){
+  return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
 }
 
 /**
- * يبدأ تسجيل صوت ويقارنه بالنص المطلوب.
- * callbacks: { onStart, onResult({transcript, score, verdict}), onError(msg), onEnd }
+ * يبدأ تسجيل صوت من المايك.
+ * callbacks: { onStart, onStop(audioUrl), onError(msg) }
+ * بيرجع دالة stop() تقدر تناديها تدوي التسجيل يدويًا.
  */
-function ruCheckPronunciation(targetText, callbacks){
+function ruStartRecording(callbacks){
   callbacks = callbacks || {};
-  if (!ruSpeechSupported()) {
-    if (callbacks.onError) callbacks.onError("المتصفح ده مش بيدعم التعرف على الصوت");
-    return;
+
+  if (!ruMicSupported()){
+    if (callbacks.onError) callbacks.onError("الجهاز ده مش بيدعم تسجيل الصوت");
+    return null;
   }
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const rec = new SR();
-  rec.lang = "ru-RU";
-  rec.interimResults = false;
-  rec.maxAlternatives = 1;
-  rec.continuous = false;
 
-  rec.onstart = () => { if (callbacks.onStart) callbacks.onStart(); };
+  let recorder = null;
+  let stopped = false;
 
-  rec.onresult = (e) => {
-    const transcript = e.results[0][0].transcript;
-    const score = ruSimilarity(targetText, transcript);
-    let verdict;
-    if (score >= 80) verdict = "excellent";
-    else if (score >= 55) verdict = "close";
-    else verdict = "retry";
-    if (callbacks.onResult) callbacks.onResult({ transcript, score, verdict });
+  navigator.mediaDevices.getUserMedia({ audio: true })
+    .then((stream) => {
+      recorder = new MediaRecorder(stream);
+      const chunks = [];
+
+      recorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) chunks.push(e.data);
+      };
+
+      recorder.onstop = () => {
+        stream.getTracks().forEach((t) => t.stop());
+        const blob = new Blob(chunks, { type: "audio/webm" });
+        const url = URL.createObjectURL(blob);
+        if (callbacks.onStop) callbacks.onStop(url);
+      };
+
+      recorder.onerror = () => {
+        if (callbacks.onError) callbacks.onError("حصلت مشكلة أثناء التسجيل");
+      };
+
+      recorder.start();
+      if (callbacks.onStart) callbacks.onStart();
+
+      // لو المستخدم دوس على stop() قبل ما الـ recorder يجهز
+      if (stopped) recorder.stop();
+    })
+    .catch(() => {
+      if (callbacks.onError) callbacks.onError("محتاجين إذن استخدام الميكروفون");
+    });
+
+  return function stop(){
+    stopped = true;
+    if (recorder && recorder.state === "recording") recorder.stop();
   };
-
-  rec.onerror = (e) => {
-    let msg = "حصلت مشكلة في التسجيل";
-    if (e.error === "not-allowed" || e.error === "permission-denied") msg = "محتاجين إذن استخدام الميكروفون";
-    else if (e.error === "no-speech") msg = "معلش، مسمعتش صوت. جرب تاني";
-    if (callbacks.onError) callbacks.onError(msg);
-  };
-
-  rec.onend = () => { if (callbacks.onEnd) callbacks.onEnd(); };
-
-  try { rec.start(); }
-  catch(e) { if (callbacks.onError) callbacks.onError("مش قادر أبدأ التسجيل"); }
 }
