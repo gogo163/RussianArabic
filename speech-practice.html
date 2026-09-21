@@ -201,8 +201,20 @@ function playTarget(){
 function playRecording(){
   if (!lastRecordingUrl) return;
   const player = document.getElementById("recPlayer");
+  const eb = document.getElementById("errorBox");
+  eb.classList.remove("shown");
   player.src = lastRecordingUrl;
-  player.play();
+  const p = player.play();
+  if (p && p.catch) {
+    p.catch(() => {
+      eb.textContent = "الجهاز ده مش قادر يشغّل التسجيل. جرب تحدّث التطبيق.";
+      eb.classList.add("shown");
+    });
+  }
+  player.onerror = () => {
+    eb.textContent = "الجهاز ده مش قادر يشغّل التسجيل. جرب تحدّث التطبيق.";
+    eb.classList.add("shown");
+  };
 }
 
 function toggleRecording(){

@@ -5,10 +5,32 @@
    داخل أي WebView جوه تطبيقات الموبايل (قيد من جوجل نفسها)، فبتشتغل
    بس جوه متصفح مستقل زي Chrome. التسجيل والتشغيل (MediaRecorder) لأ،
    بيشتغل عادي جوه التطبيق.
+
+   ملاحظة: بعض محركات الـ WebView بتدعم تسجيل audio/webm لكن مش بتدعم
+   تشغيله بعدين. عشان كده الكود ده بيجرب أكتر من صيغة (mp4/ogg/webm)
+   ويختار أول صيغة الجهاز بيدعمها فعليًا للتسجيل والتشغيل مع بعض.
 */
 
 function ruMicSupported(){
   return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
+}
+
+// يحدد أفضل صيغة تسجيل مدعومة من الجهاز (تسجيل + تشغيل)
+function ruPickRecordingMimeType(){
+  const candidates = [
+    "audio/mp4",
+    "audio/aac",
+    "audio/ogg;codecs=opus",
+    "audio/webm;codecs=opus",
+    "audio/webm",
+    ""
+  ];
+  for (const type of candidates) {
+    if (type === "" || (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(type))) {
+      return type;
+    }
+  }
+  return "";
 }
 
 /**
@@ -29,8 +51,15 @@ function ruStartRecording(callbacks){
 
   navigator.mediaDevices.getUserMedia({ audio: true })
     .then((stream) => {
-      recorder = new MediaRecorder(stream);
+      const mimeType = ruPickRecordingMimeType();
+      try {
+        recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+      } catch (e) {
+        recorder = new MediaRecorder(stream);
+      }
+
       const chunks = [];
+      const usedType = recorder.mimeType || mimeType || "audio/webm";
 
       recorder.ondataavailable = (e) => {
         if (e.data && e.data.size > 0) chunks.push(e.data);
@@ -38,7 +67,7 @@ function ruStartRecording(callbacks){
 
       recorder.onstop = () => {
         stream.getTracks().forEach((t) => t.stop());
-        const blob = new Blob(chunks, { type: "audio/webm" });
+        const blob = new Blob(chunks, { type: usedType });
         const url = URL.createObjectURL(blob);
         if (callbacks.onStop) callbacks.onStop(url);
       };
@@ -50,7 +79,6 @@ function ruStartRecording(callbacks){
       recorder.start();
       if (callbacks.onStart) callbacks.onStart();
 
-      // لو المستخدم دوس على stop() قبل ما الـ recorder يجهز
       if (stopped) recorder.stop();
     })
     .catch(() => {
