@@ -92,7 +92,7 @@
 <div class="stars"></div>
 
 <div class="app-header">
-  <a class="icon-circle" href="index.html" aria-label="الرئيسية">←</a>
+  <a class="icon-circle" href="#" onclick="goBackToApp(); return false;" aria-label="الرئيسية">←</a>
   <div class="stats" id="statsBar"></div>
   <button class="theme-toggle" id="themeToggleBtn" onclick="ruToggleTheme()" aria-label="تبديل الوضع الليلي">🌙</button>
 </div>
@@ -149,7 +149,7 @@
 </div>
 
 <nav class="bottom-nav">
-  <a href="index.html"><span class="tab-icon">🏠</span><span>الرئيسية</span></a>
+  <a href="#" onclick="goBackToApp(); return false;"><span class="tab-icon">🏠</span><span>الرئيسية</span></a>
   <a href="letters.html"><span class="tab-icon">🔤</span><span>الحروف</span></a>
   <a href="vocabulary.html"><span class="tab-icon">📚</span><span>المفردات</span></a>
   <a class="disabled" href="#"><span class="tab-icon">🏅</span><span>إنجازاتي</span><span class="dot"></span></a>
@@ -178,6 +178,15 @@ let scoreSum = 0;
 let isRecording = false;
 let stopRecordingFn = null;
 let lastRecordingUrl = null;
+
+// يرجّع للتطبيق (Kodular) لو الصفحة شغالة جواه، أو للرئيسية لو فتحتها من متصفح
+function goBackToApp(){
+  if (window.AppInventor && window.AppInventor.setWebViewString) {
+    window.AppInventor.setWebViewString('back');
+  } else {
+    location.href = 'index.html';
+  }
+}
 
 function loadPool(){
   pool = [...ruAllVocabWords()].sort(() => Math.random()-0.5);
