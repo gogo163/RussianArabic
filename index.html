@@ -330,7 +330,8 @@
     speechLink.addEventListener("click", function (e) {
       if (window.AppInventor) {
         e.preventDefault();
-        window.AppInventor.setWebViewString("open_pronunciation");
+        // قيمة مختلفة كل مرة عشان حدث WebViewStringChange يشتغل في كل ضغطة
+        window.AppInventor.setWebViewString("open_pronunciation|" + Date.now());
       }
       // لو الصفحة اتفتحت في متصفح عادي (مش جوه التطبيق)، الرابط هيشتغل عادي زي أي لينك
     });
