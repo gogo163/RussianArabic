@@ -52,6 +52,14 @@
     z-index:10;
   }
   .toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); }
+
+  .diag-box{
+    display:none; margin:14px 0; padding:10px 14px; font-size:.72rem;
+    background:rgba(166,69,63,.1); border:1px solid rgba(166,69,63,.35);
+    border-radius:8px; color:var(--brick); direction:ltr; text-align:left;
+    word-break:break-all;
+  }
+  .diag-box.show{ display:block; }
 </style>
 </head>
 <body>
@@ -70,6 +78,7 @@
   </div>
 
   <div class="scenario-tabs" id="scenarioTabs"></div>
+  <div class="diag-box" id="diagBox"></div>
   <div class="phrase-list" id="phraseList"></div>
 </div>
 
@@ -84,6 +93,7 @@
 
 <script src="progress.js"></script>
 <script src="theme.js"></script>
+<script src="audio.js"></script>
 <script>
 ruRenderStatsBar("statsBar");
 
@@ -165,7 +175,7 @@ function renderPhrases(){
           <div class="phrase-ar">${p.ar}</div>
         </div>
         <div class="phrase-actions">
-          <button onclick="ruSpeak('${p.ru.replace(/'/g, "\\'")}')">🔊</button>
+          <button onclick="ruSpeak('${p.ru.replace(/'/g, "\\'")}', this)">🔊</button>
           <button class="mark ${learned ? 'on' : ''}" onclick="togglePhrase('${p.id}')">✓</button>
         </div>
       </div>
@@ -173,12 +183,13 @@ function renderPhrases(){
   }).join("");
 }
 
-function ruSpeak(text){
-  try {
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = "ru-RU"; u.rate = 0.85;
-    speechSynthesis.cancel(); speechSynthesis.speak(u);
-  } catch(e) { console.warn(e); }
+function ruSpeak(text, btn){
+  ruPlayAudio(text, undefined, (info) => {
+    const box = document.getElementById("diagBox");
+    const btnId = btn ? (btn.outerHTML.slice(0,40)) : "?";
+    box.textContent = "🔎 " + info.stage + ": " + info.detail;
+    box.classList.add("show");
+  });
 }
 
 function togglePhrase(id){

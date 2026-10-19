@@ -33,23 +33,39 @@ function ruSpeakFallback(text, rate){
   } catch (e) { console.warn("speechSynthesis unavailable", e); }
 }
 
-/* الفانكشن الرئيسية — دي اللي كل صفحات التطبيق بتناديها */
-function ruPlayAudio(text, rate){
+/* الفانكشن الرئيسية — دي اللي كل صفحات التطبيق بتناديها.
+   onDiag (اختياري) بيتنادى بتفاصيل تشخيصية: {stage, detail} — مفيدة وقت تصحيح الأخطاء. */
+function ruPlayAudio(text, rate, onDiag){
   if (!text) return;
-  const slug = ruAudioSlug(text);
-  if (!slug) { ruSpeakFallback(text, rate); return; }
+  const diag = (stage, detail) => { if (onDiag) onDiag({ stage, detail }); };
 
-  const audio = new Audio(RU_AUDIO_FOLDER + slug + ".wav");
+  const slug = ruAudioSlug(text);
+  if (!slug) { diag("no-slug", ""); ruSpeakFallback(text, rate); return; }
+
+  const path = RU_AUDIO_FOLDER + slug + ".wav";
+  const audio = new Audio(path);
   let fellBack = false;
-  const fallback = () => {
+  const fallback = (reason) => {
     if (fellBack) return;
     fellBack = true;
+    diag("fallback", reason + " (" + path + ")");
     ruSpeakFallback(text, rate);
   };
 
-  audio.addEventListener("error", fallback);
-  const playPromise = audio.play();
+  audio.addEventListener("error", () => {
+    const codeMap = {1:"ABORTED",2:"NETWORK",3:"DECODE",4:"SRC_NOT_SUPPORTED"};
+    const code = audio.error ? audio.error.code : 0;
+    fallback("audio-error:" + (codeMap[code] || code));
+  });
+  audio.addEventListener("canplaythrough", () => diag("loaded-ok", path));
+
+  let playPromise;
+  try { playPromise = audio.play(); }
+  catch(e){ fallback("play-threw:" + e.message); return; }
+
   if (playPromise && typeof playPromise.catch === "function") {
-    playPromise.catch(fallback);
+    playPromise.catch((e) => fallback("play-rejected:" + e.message));
+  } else if (!playPromise) {
+    diag("play-no-promise", path);
   }
 }
