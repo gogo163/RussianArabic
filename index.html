@@ -221,10 +221,17 @@
       </div>
     </a>
 
-    <a class="node-link" href="speech-practice.html" id="speechNodeLink">
+    <a class="node-link" href="speech-practice.html">
       <div class="node" id="speechNode">
         <div class="side marker">🎤</div>
         <div class="side text"><h3>تدريب النطق</h3><p id="speechNodeDesc">قول الكلمة، وشوف تقييمك فوراً</p></div>
+      </div>
+    </a>
+
+    <a class="node-link" href="games.html">
+      <div class="node" id="gamesNode">
+        <div class="side marker">🎮</div>
+        <div class="side text"><h3>ألعاب سريعة</h3><p id="gamesNodeDesc">تحدي الوقت، تجميع الجمل، الأذن الذهبية</p></div>
       </div>
     </a>
   </div>
@@ -316,25 +323,13 @@
   }
 
   document.getElementById("speechNode").classList.add("active");
+  document.getElementById("gamesNode").classList.add("active");
 
   if (learnedCount > 0 && learnedCount < 33) {
     document.querySelector("#continueCard .txt p").textContent = "كمّل — باقيلك " + (33 - learnedCount) + " حرف";
   } else if (learnedCount >= 33) {
     document.querySelector("#continueCard .eyebrow").textContent = "خلصت القسم ده! ✓";
     document.querySelector("#continueCard .txt p").textContent = "راجع أي حرف تحب";
-  }
-
-  // ------- جسر لفتح صفحة النطق في شاشة Kodular منفصلة (CustomWebView مع إذن المايك) -------
-  const speechLink = document.getElementById("speechNodeLink");
-  if (speechLink) {
-    speechLink.addEventListener("click", function (e) {
-      if (window.AppInventor) {
-        e.preventDefault();
-        // قيمة مختلفة كل مرة عشان حدث WebViewStringChange يشتغل في كل ضغطة
-        window.AppInventor.setWebViewString("open_pronunciation|" + Date.now());
-      }
-      // لو الصفحة اتفتحت في متصفح عادي (مش جوه التطبيق)، الرابط هيشتغل عادي زي أي لينك
-    });
   }
 </script>
 </body>

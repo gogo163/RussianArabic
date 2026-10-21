@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ألعاب سريعة — تعلم الروسية بالعربي</title>
+<script>
+  (function(){
+    var t = localStorage.getItem("ru_arabi_theme");
+    if (t === "dark") document.documentElement.setAttribute("data-theme", "dark");
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .page-head{ padding:28px 0 8px; text-align:center; }
+  .page-head h1{ font-size:2rem; color:var(--gold-soft); margin-bottom:8px; }
+  .page-head p{ color:var(--text-dim2); font-size:.95rem; }
+
+  .game-grid{ display:flex; flex-direction:column; gap:12px; padding:20px 0 30px; }
+  .game-card{
+    display:flex; align-items:center; gap:14px;
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    padding:18px; cursor:pointer;
+  }
+  .game-card .icon{ font-size:2rem; flex:none; }
+  .game-card h3{ font-size:1.05rem; color:var(--text); margin-bottom:3px; }
+  .game-card p{ font-size:.8rem; color:var(--text-dim3); }
+  .game-card .best{ margin-right:auto; text-align:center; flex:none; }
+  .game-card .best .num{ font-family:'Aref Ruqaa', serif; font-size:1.1rem; color:var(--gold-soft); }
+  .game-card .best .lbl{ font-size:.62rem; color:var(--text-dim4); }
+
+  /* ---- shared game shell ---- */
+  .game-view{ display:none; padding:20px 0 40px; }
+  .game-view.open{ display:block; }
+  .game-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .game-top button{ background:none; border:none; color:var(--text-dim3); font-size:1.1rem; cursor:pointer; }
+  .game-top .timer{ font-family:'Aref Ruqaa', serif; font-size:1.3rem; color:var(--gold-soft); }
+  .game-top .score{ font-size:.85rem; color:var(--text-dim2); }
+
+  .timer-bar-wrap{ height:8px; background:var(--surface2); border-radius:4px; overflow:hidden; margin-bottom:24px; }
+  .timer-bar{ height:100%; background:var(--gold); width:100%; transition:width .1s linear; }
+  .timer-bar.danger{ background:var(--brick); }
+
+  /* Time Attack */
+  .ta-word{ text-align:center; font-family:'Aref Ruqaa', serif; font-size:2.4rem; color:var(--text); margin-bottom:28px; }
+  .ta-choices{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .ta-choices button{
+    font-family:'Tajawal',sans-serif; font-size:.95rem; padding:18px 12px;
+    background:var(--surface); border:1px solid var(--border); border-radius:10px; color:var(--text); cursor:pointer;
+  }
+  .ta-choices button.correct{ background:rgba(63,122,87,.25); border-color:var(--green); }
+  .ta-choices button.wrong{ background:rgba(166,69,63,.25); border-color:var(--brick); }
+
+  /* Word Scramble */
+  .ws-answer{
+    min-height:62px; display:flex; flex-wrap:wrap; gap:8px; align-content:flex-start;
+    background:var(--surface3); border:1px dashed var(--border); border-radius:10px;
+    padding:12px; margin-bottom:18px;
+  }
+  .ws-pool{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:20px; }
+  .ws-chip{
+    font-family:'Aref Ruqaa', serif; font-size:1.1rem; color:var(--text);
+    background:var(--surface2); border:1px solid var(--border); border-radius:8px;
+    padding:8px 14px; cursor:pointer;
+  }
+  .ws-chip.used{ opacity:.25; pointer-events:none; }
+  .ws-hint{ text-align:center; font-size:.85rem; color:var(--text-dim3); margin-bottom:14px; }
+  .ws-feedback{ text-align:center; font-size:.95rem; font-weight:800; min-height:1.4em; margin-bottom:10px; }
+  .ws-feedback.good{ color:var(--green); }
+  .ws-feedback.bad{ color:var(--brick); }
+
+  /* Golden Ear */
+  .ge-center{ text-align:center; padding:10px 0 28px; }
+  .ge-play-btn{
+    width:110px; height:110px; border-radius:50%;
+    background:linear-gradient(135deg, var(--gold-soft), var(--gold));
+    border:none; font-size:2.6rem; cursor:pointer; color:var(--on-accent);
+    box-shadow:0 8px 24px rgba(212,169,79,.3);
+  }
+  .ge-hint{ font-size:.82rem; color:var(--text-dim3); margin-top:12px; }
+  .ge-choices{ display:flex; flex-direction:column; gap:10px; margin-top:24px; }
+  .ge-choices button{
+    font-family:'Aref Ruqaa', serif; font-size:1.15rem;
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:14px; color:var(--text); cursor:pointer;
+  }
+  .ge-choices button.correct{ background:rgba(63,122,87,.25); border-color:var(--green); }
+  .ge-choices button.wrong{ background:rgba(166,69,63,.25); border-color:var(--brick); }
+
+  /* Result screen (shared) */
+  .result-box{ text-align:center; padding:20px 0; }
+  .result-box .big{ font-size:2.4rem; margin-bottom:10px; }
+  .result-box .score-num{ font-family:'Aref Ruqaa', serif; font-size:2rem; color:var(--gold-soft); margin-bottom:6px; }
+  .result-box p{ font-size:.9rem; color:var(--text-dim2); margin-bottom:20px; }
+  .result-actions{ display:flex; gap:10px; justify-content:center; }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+
+<div class="app-header">
+  <a class="icon-circle" href="index.html" aria-label="الرئيسية">←</a>
+  <div class="stats" id="statsBar"></div>
+  <button class="theme-toggle" id="themeToggleBtn" onclick="ruToggleTheme()" aria-label="تبديل الوضع الليلي">🌙</button>
+</div>
+
+<div class="wrap has-bottom-nav">
+  <div class="page-head" id="pageHead">
+    <h1>ألعاب سريعة 🎮</h1>
+    <p>تثبيت الكلمات بشكل ممتع ومحمّس</p>
+  </div>
+
+  <div class="game-grid" id="gameGrid">
+    <div class="game-card" onclick="startTimeAttack()">
+      <span class="icon">⏱️</span>
+      <div><h3>تحدي الوقت</h3><p>وصّل الكلمة بمعناها قبل ما الوقت يخلص</p></div>
+      <div class="best"><div class="num" id="taBest">0</div><div class="lbl">أفضل نتيجة</div></div>
+    </div>
+    <div class="game-card" onclick="startScramble()">
+      <span class="icon">🧩</span>
+      <div><h3>تجميع الجمل</h3><p>رتّب كلمات الجملة الروسية المبعثرة</p></div>
+      <div class="best"><div class="num" id="wsBest">0</div><div class="lbl">أفضل نتيجة</div></div>
+    </div>
+    <div class="game-card" onclick="startGoldenEar()">
+      <span class="icon">👂</span>
+      <div><h3>الأذن الذهبية</h3><p>اسمع بس، وحدد الكلمة الصح من غير قراءة</p></div>
+      <div class="best"><div class="num" id="geBest">0</div><div class="lbl">أفضل نتيجة</div></div>
+    </div>
+  </div>
+
+  <!-- Time Attack -->
+  <div class="game-view" id="taView">
+    <div class="game-top">
+      <button onclick="exitGame('ta')">✕</button>
+      <span class="timer" id="taTimer">60</span>
+      <span class="score">النقط: <b id="taScore">0</b></span>
+    </div>
+    <div class="timer-bar-wrap"><div class="timer-bar" id="taBar"></div></div>
+    <div id="taBody"></div>
+  </div>
+
+  <!-- Word Scramble -->
+  <div class="game-view" id="wsView">
+    <div class="game-top">
+      <button onclick="exitGame('ws')">✕</button>
+      <span style="color:var(--text-dim3); font-size:.85rem;" id="wsCount">1/8</span>
+      <span class="score">النقط: <b id="wsScore">0</b></span>
+    </div>
+    <div id="wsBody"></div>
+  </div>
+
+  <!-- Golden Ear -->
+  <div class="game-view" id="geView">
+    <div class="game-top">
+      <button onclick="exitGame('ge')">✕</button>
+      <span style="color:var(--text-dim3); font-size:.85rem;" id="geCount">1/10</span>
+      <span class="score">النقط: <b id="geScore">0</b></span>
+    </div>
+    <div id="geBody"></div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <a href="index.html"><span class="tab-icon">🏠</span><span>الرئيسية</span></a>
+  <a href="letters.html"><span class="tab-icon">🔤</span><span>الحروف</span></a>
+  <a href="vocabulary.html"><span class="tab-icon">📚</span><span>المفردات</span></a>
+  <a class="disabled" href="#"><span class="tab-icon">🏅</span><span>إنجازاتي</span><span class="dot"></span></a>
+</nav>
+
+<script src="progress.js"></script>
+<script src="theme.js"></script>
+<script src="audio.js"></script>
+<script src="vocab.js"></script>
+<script>
+ruRenderStatsBar("statsBar");
+
+function shuffle(arr){
+  const a = [...arr];
+  for (let i = a.length-1; i>0; i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+const GAME_BEST_KEY = "ru_arabi_games_best";
+function loadBest(){
+  try { return JSON.parse(localStorage.getItem(GAME_BEST_KEY)) || {}; }
+  catch(e){ return {}; }
+}
+function saveBest(key, score){
+  const best = loadBest();
+  if (!best[key] || score > best[key]) { best[key] = score; localStorage.setItem(GAME_BEST_KEY, JSON.stringify(best)); }
+  renderBests();
+}
+function renderBests(){
+  const best = loadBest();
+  document.getElementById("taBest").textContent = best.ta || 0;
+  document.getElementById("wsBest").textContent = best.ws || 0;
+  document.getElementById("geBest").textContent = best.ge || 0;
+}
+renderBests();
+
+function showOnly(viewId){
+  document.getElementById("pageHead").style.display = "none";
+  document.getElementById("gameGrid").style.display = "none";
+  ["taView","wsView","geView"].forEach(id => document.getElementById(id).classList.remove("open"));
+  if (viewId) document.getElementById(viewId).classList.add("open");
+}
+function exitGame(which){
+  if (which === "ta" && taTimerHandle) clearInterval(taTimerHandle);
+  document.getElementById("pageHead").style.display = "";
+  document.getElementById("gameGrid").style.display = "";
+  ["taView","wsView","geView"].forEach(id => document.getElementById(id).classList.remove("open"));
+  renderBests();
+}
+
+/* ===================== 1) تحدي الوقت ===================== */
+let taPool = [], taScore = 0, taTimeLeft = 60, taTimerHandle = null;
+
+function startTimeAttack(){
+  showOnly("taView");
+  taPool = shuffle(ruAllVocabWords());
+  taScore = 0;
+  taTimeLeft = 60;
+  document.getElementById("taScore").textContent = taScore;
+  updateTaTimerUI();
+  if (taTimerHandle) clearInterval(taTimerHandle);
+  taTimerHandle = setInterval(() => {
+    taTimeLeft -= 0.1;
+    updateTaTimerUI();
+    if (taTimeLeft <= 0) { clearInterval(taTimerHandle); taGameOver(); }
+  }, 100);
+  nextTaRound();
+}
+
+function updateTaTimerUI(){
+  document.getElementById("taTimer").textContent = Math.max(0, Math.ceil(taTimeLeft));
+  const pct = Math.max(0, (taTimeLeft/60)*100);
+  const bar = document.getElementById("taBar");
+  bar.style.width = pct + "%";
+  bar.classList.toggle("danger", taTimeLeft < 10);
+}
+
+function nextTaRound(){
+  if (taPool.length < 4) taPool = shuffle(ruAllVocabWords());
+  const word = taPool.pop();
+  const wrong = shuffle(ruAllVocabWords().filter(w => w.id !== word.id)).slice(0,3);
+  const options = shuffle([word, ...wrong]);
+
+  document.getElementById("taBody").innerHTML = `
+    <div class="ta-word">${word.ru}</div>
+    <div class="ta-choices" id="taChoices"></div>
+  `;
+  const el = document.getElementById("taChoices");
+  options.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.textContent = opt.ar;
+    btn.onclick = () => taAnswer(opt.id === word.id, btn);
+    el.appendChild(btn);
+  });
+}
+
+function taAnswer(correct, btn){
+  btn.classList.add(correct ? "correct" : "wrong");
+  if (correct) { taScore += 10; taTimeLeft = Math.min(60, taTimeLeft + 1); }
+  else { taTimeLeft = Math.max(0, taTimeLeft - 3); }
+  document.getElementById("taScore").textContent = taScore;
+  setTimeout(() => { if (taTimeLeft > 0) nextTaRound(); }, 350);
+}
+
+function taGameOver(){
+  RuProgress.addXp(Math.round(taScore/5), "game_time_attack");
+  ruRenderStatsBar("statsBar");
+  saveBest("ta", taScore);
+  document.getElementById("taBody").innerHTML = `
+    <div class="result-box">
+      <div class="big">⏱️</div>
+      <div class="score-num">${taScore} نقطة</div>
+      <p>خلص الوقت! كسبت ${Math.round(taScore/5)} XP</p>
+      <div class="result-actions">
+        <button class="cta" onclick="startTimeAttack()">تاني</button>
+        <button class="btn-ghost" onclick="exitGame('ta')">رجوع</button>
+      </div>
+    </div>`;
+}
+
+/* ===================== 2) تجميع الجمل ===================== */
+const SCRAMBLE_SENTENCES = [
+  "Я изучаю русский язык",
+  "Где находится вокзал",
+  "Это слишком дорого",
+  "Мне нужно такси",
+  "Я не понимаю",
+  "Как вас зовут",
+  "Приятно познакомиться",
+  "Спасибо за помощь"
+];
+let wsPool = [], wsIdx = 0, wsScore = 0, wsCurrentWords = [], wsBuilt = [];
+
+function startScramble(){
+  showOnly("wsView");
+  wsPool = shuffle(SCRAMBLE_SENTENCES);
+  wsIdx = 0; wsScore = 0;
+  document.getElementById("wsScore").textContent = wsScore;
+  nextWsRound();
+}
+
+function nextWsRound(){
+  if (wsIdx >= wsPool.length) { wsGameOver(); return; }
+  document.getElementById("wsCount").textContent = (wsIdx+1) + "/" + wsPool.length;
+  const sentence = wsPool[wsIdx];
+  wsCurrentWords = sentence.split(" ");
+  wsBuilt = [];
+  const shuffled = shuffle(wsCurrentWords.map((w,i) => ({w, i})));
+
+  document.getElementById("wsBody").innerHTML = `
+    <div class="ws-hint">رتّب الكلمات عشان تكوّن جملة صحيحة</div>
+    <div class="ws-answer" id="wsAnswer"></div>
+    <div class="ws-pool" id="wsPoolEl"></div>
+    <div class="ws-feedback" id="wsFeedback"></div>
+  `;
+  const poolEl = document.getElementById("wsPoolEl");
+  shuffled.forEach(item => {
+    const chip = document.createElement("span");
+    chip.className = "ws-chip";
+    chip.textContent = item.w;
+    chip.dataset.origIdx = item.i;
+    chip.onclick = () => wsPick(chip, item.w);
+    poolEl.appendChild(chip);
+  });
+}
+
+function wsPick(chip, word){
+  if (chip.classList.contains("used")) return;
+  chip.classList.add("used");
+  wsBuilt.push(word);
+  const ansEl = document.getElementById("wsAnswer");
+  const span = document.createElement("span");
+  span.className = "ws-chip";
+  span.textContent = word;
+  ansEl.appendChild(span);
+
+  if (wsBuilt.length === wsCurrentWords.length) {
+    const correct = wsBuilt.join(" ") === wsCurrentWords.join(" ");
+    const fb = document.getElementById("wsFeedback");
+    if (correct) {
+      fb.textContent = "✓ صح!"; fb.className = "ws-feedback good";
+      wsScore += 10;
+    } else {
+      fb.textContent = "الصح: " + wsCurrentWords.join(" "); fb.className = "ws-feedback bad";
+    }
+    document.getElementById("wsScore").textContent = wsScore;
+    wsIdx++;
+    setTimeout(nextWsRound, 1400);
+  }
+}
+
+function wsGameOver(){
+  const xp = Math.round(wsScore/3);
+  RuProgress.addXp(xp, "game_scramble");
+  ruRenderStatsBar("statsBar");
+  saveBest("ws", wsScore);
+  document.getElementById("wsBody").innerHTML = `
+    <div class="result-box">
+      <div class="big">🧩</div>
+      <div class="score-num">${wsScore} نقطة</div>
+      <p>خلصت كل الجمل! كسبت ${xp} XP</p>
+      <div class="result-actions">
+        <button class="cta" onclick="startScramble()">تاني</button>
+        <button class="btn-ghost" onclick="exitGame('ws')">رجوع</button>
+      </div>
+    </div>`;
+}
+
+/* ===================== 3) الأذن الذهبية ===================== */
+let gePool = [], geIdx = 0, geScore = 0, geTotal = 10, geCurrent = null;
+
+function startGoldenEar(){
+  showOnly("geView");
+  gePool = shuffle(ruAllVocabWords()).slice(0, geTotal);
+  geIdx = 0; geScore = 0;
+  document.getElementById("geScore").textContent = geScore;
+  nextGeRound();
+}
+
+function nextGeRound(){
+  if (geIdx >= gePool.length) { geGameOver(); return; }
+  document.getElementById("geCount").textContent = (geIdx+1) + "/" + gePool.length;
+  geCurrent = gePool[geIdx];
+  const wrong = shuffle(ruAllVocabWords().filter(w => w.id !== geCurrent.id)).slice(0,3);
+  const options = shuffle([geCurrent, ...wrong]);
+
+  document.getElementById("geBody").innerHTML = `
+    <div class="ge-center">
+      <button class="ge-play-btn" onclick="ruPlayAudio('${geCurrent.ru.replace(/'/g,"\\'")}')">🔊</button>
+      <div class="ge-hint">دوس واسمع، واختار الكلمة اللي سمعتها</div>
+    </div>
+    <div class="ge-choices" id="geChoices"></div>
+  `;
+  ruPlayAudio(geCurrent.ru);
+  const el = document.getElementById("geChoices");
+  options.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.textContent = opt.ru;
+    btn.onclick = () => geAnswer(opt.id === geCurrent.id, btn);
+    el.appendChild(btn);
+  });
+}
+
+function geAnswer(correct, btn){
+  btn.classList.add(correct ? "correct" : "wrong");
+  if (correct) geScore += 10;
+  document.getElementById("geScore").textContent = geScore;
+  geIdx++;
+  setTimeout(nextGeRound, 900);
+}
+
+function geGameOver(){
+  const xp = Math.round(geScore/4);
+  RuProgress.addXp(xp, "game_golden_ear");
+  ruRenderStatsBar("statsBar");
+  saveBest("ge", geScore);
+  document.getElementById("geBody").innerHTML = `
+    <div class="result-box">
+      <div class="big">👂</div>
+      <div class="score-num">${geScore} نقطة</div>
+      <p>خلصت الجولة! كسبت ${xp} XP</p>
+      <div class="result-actions">
+        <button class="cta" onclick="startGoldenEar()">تاني</button>
+        <button class="btn-ghost" onclick="exitGame('ge')">رجوع</button>
+      </div>
+    </div>`;
+}
+</script>
+</body>
+</html>
