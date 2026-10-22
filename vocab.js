@@ -52,6 +52,58 @@ const VOCAB_CATEGORIES = [
       { id:"sestra", ru:"сестра",tr:"sestrá", ar:"أخت" },
       { id:"drug",   ru:"друг",  tr:"drug",   ar:"صديق" }
     ]
+  },
+  {
+    id:"numbers", title:"أرقام", icon:"🔢",
+    words:[
+      { id:"odin",    ru:"один",    tr:"odín",    ar:"واحد" },
+      { id:"dva",     ru:"два",     tr:"dva",     ar:"اتنين" },
+      { id:"tri",     ru:"три",     tr:"tri",     ar:"تلاتة" },
+      { id:"chetyre", ru:"четыре",  tr:"chetýre", ar:"أربعة" },
+      { id:"pyat",    ru:"пять",    tr:"pyat'",   ar:"خمسة" },
+      { id:"shest",   ru:"шесть",   tr:"shest'",  ar:"ستة" },
+      { id:"sem",     ru:"семь",    tr:"sem'",    ar:"سبعة" },
+      { id:"vosem",   ru:"восемь",  tr:"vósem'",  ar:"تمانية" },
+      { id:"devyat",  ru:"девять",  tr:"dévyat'", ar:"تسعة" },
+      { id:"desyat",  ru:"десять",  tr:"désyat'", ar:"عشرة" }
+    ]
+  },
+  {
+    id:"days", title:"أيام الأسبوع", icon:"📅",
+    words:[
+      { id:"ponedelnik", ru:"понедельник", tr:"ponedél'nik", ar:"الاتنين" },
+      { id:"vtornik",    ru:"вторник",     tr:"vtórnik",     ar:"التلات" },
+      { id:"sreda",      ru:"среда",       tr:"sredá",       ar:"الأربع" },
+      { id:"chetverg",   ru:"четверг",     tr:"chetvérg",    ar:"الخميس" },
+      { id:"pyatnitsa",  ru:"пятница",     tr:"pyátnitsa",   ar:"الجمعة" },
+      { id:"subbota",    ru:"суббота",     tr:"subbóta",     ar:"السبت" },
+      { id:"voskresenye",ru:"воскресенье", tr:"voskresén'ye",ar:"الحد" }
+    ]
+  },
+  {
+    id:"colors", title:"ألوان", icon:"🎨",
+    words:[
+      { id:"krasny",   ru:"красный",  tr:"krásny",   ar:"أحمر" },
+      { id:"siniy",    ru:"синий",    tr:"síniy",    ar:"أزرق" },
+      { id:"zeleny",   ru:"зелёный",  tr:"zelyóny",  ar:"أخضر" },
+      { id:"zhyolty",  ru:"жёлтый",   tr:"zhyólty",  ar:"أصفر" },
+      { id:"chyorny",  ru:"чёрный",   tr:"chyórny",  ar:"أسود" },
+      { id:"bely",     ru:"белый",    tr:"bély",     ar:"أبيض" },
+      { id:"rozovy",   ru:"розовый",  tr:"rózovy",   ar:"وردي" },
+      { id:"oranzhevy",ru:"оранжевый",tr:"oránzhevy",ar:"برتقالي" }
+    ]
+  },
+  {
+    id:"directions", title:"اتجاهات", icon:"🧭",
+    words:[
+      { id:"nalevo",  ru:"налево",  tr:"nalévo",  ar:"ع الشمال" },
+      { id:"napravo", ru:"направо", tr:"naprávo", ar:"ع اليمين" },
+      { id:"pryamo",  ru:"прямо",   tr:"pryámo",  ar:"دغري" },
+      { id:"zdes",    ru:"здесь",   tr:"zdes'",   ar:"هنا" },
+      { id:"tam",     ru:"там",     tr:"tam",     ar:"هناك" },
+      { id:"blizko",  ru:"близко",  tr:"blízko",  ar:"قريب" },
+      { id:"daleko",  ru:"далеко",  tr:"dalekó",  ar:"بعيد" }
+    ]
   }
 ];
 

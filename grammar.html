@@ -134,6 +134,49 @@
     </div>
   </section>
 
+  <section class="block">
+    <h2>الجمع (المفرد والجمع)</h2>
+    <p>آخر الاسم بيتغيّر عشان يدل على الجمع، حسب نوع الاسم (مذكر / مؤنث / محايد).</p>
+    <div class="case-card">
+      <span class="tag">مذكر</span>
+      <h3>стол ← столы</h3>
+      <p>الاسم المذكر بينتهي بحرف ساكن غالباً، وفي الجمع بياخد <b>ы</b> أو <b>и</b>.</p>
+      <div class="ex"><b>стол</b> (طاولة) ← <b>столы</b> (طاولات)</div>
+    </div>
+    <div class="case-card">
+      <span class="tag">مؤنث</span>
+      <h3>книга ← книги</h3>
+      <p>الاسم المؤنث غالباً بينتهي بـ <b>а</b>، وفي الجمع بتتحول لـ <b>ы</b> أو <b>и</b>.</p>
+      <div class="ex"><b>книга</b> (كتاب) ← <b>книги</b> (كتب)</div>
+    </div>
+    <div class="case-card">
+      <span class="tag">محايد</span>
+      <h3>окно ← окна</h3>
+      <p>الاسم المحايد غالباً بينتهي بـ <b>о</b>، وفي الجمع بتتحول لـ <b>а</b>.</p>
+      <div class="ex"><b>окно</b> (شباك) ← <b>окна</b> (شبابيك)</div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>الصفات</h2>
+    <p>الصفة في الروسي لازم "توافق" نوع الاسم اللي بتوصفه — يعني بتتغيّر آخرها حسب مذكر/مؤنث/محايد/جمع.</p>
+    <div class="verb-card">
+      <h3>красивый <span style="color:var(--gold-soft); font-size:.85rem;">— جميل / حلو</span></h3>
+      <div class="meaning">مثال: дом (بيت، مذكر) / девушка (بنت، مؤنث) / утро (صباح، محايد)</div>
+      <div id="adjTable"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>الماضي</h2>
+    <p>تصريف الماضي في الروسي أسهل من المضارع — مفيش تصريف لكل ضمير، بس الفعل بيتغيّر حسب <b>نوع الفاعل</b> (مذكر/مؤنث/محايد/جمع) مش حسب الشخص.</p>
+    <div class="verb-card">
+      <h3>говорить <span style="color:var(--gold-soft); font-size:.85rem;">— في الماضي</span></h3>
+      <div class="meaning">قال / اتكلم</div>
+      <div id="pastTable"></div>
+    </div>
+  </section>
+
   <div class="finish-box">
     <p>القواعد موضوع كبير — هنوسّعه بتمارين أكتر لاحقاً، ده أساس البداية</p>
     <button class="cta" id="finishBtn" onclick="ruFinishSection()">فهمت الأساسيات ⭐</button>
@@ -236,6 +279,22 @@ function renderVerb(elId, rows){
 }
 renderVerb("verb1", VERB1);
 renderVerb("verb2", VERB2);
+
+const ADJ_ROWS = [
+  { p:"дом (مذكر)",    f:"крас<span class='end'>ивый</span> дом",   raw:"красивый дом" },
+  { p:"девушка (مؤنث)", f:"крас<span class='end'>ивая</span> девушка", raw:"красивая девушка" },
+  { p:"утро (محايد)",  f:"крас<span class='end'>ивое</span> утро",  raw:"красивое утро" },
+  { p:"дома (جمع)",    f:"крас<span class='end'>ивые</span> дома",  raw:"красивые дома" }
+];
+renderVerb("adjTable", ADJ_ROWS);
+
+const PAST_ROWS = [
+  { p:"он (مذكر)",  f:"говорил<span class='end'></span>",  raw:"он говорил" },
+  { p:"она (مؤنث)", f:"говори<span class='end'>ла</span>", raw:"она говорила" },
+  { p:"оно (محايد)",f:"говори<span class='end'>ло</span>", raw:"оно говорило" },
+  { p:"они (جمع)",  f:"говори<span class='end'>ли</span>", raw:"они говорили" }
+];
+renderVerb("pastTable", PAST_ROWS);
 
 function showToast(msg){
   const t = document.getElementById("toast");
