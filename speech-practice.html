@@ -44,7 +44,7 @@
     box-shadow:0 8px 24px rgba(212,169,79,.3);
     color:var(--on-accent);
   }
-  .mic-btn.listening{ animation: ruPulse 1s infinite; background:linear-gradient(135deg, var(--brick), #c0554d); }
+  .mic-btn.listening{ animation: ruPulse 1s infinite; }
   @keyframes ruPulse{
     0%{ box-shadow:0 0 0 0 rgba(212,169,79,.5); }
     70%{ box-shadow:0 0 0 22px rgba(212,169,79,0); }
@@ -52,32 +52,19 @@
   }
   .mic-hint{ font-size:.8rem; color:var(--text-dim4); margin-top:12px; }
 
-  .result-box{ display:none; margin-top:24px; }
+  .result-box{ display:none; margin-top:24px; text-align:right; }
   .result-box.shown{ display:block; }
-
-  .playback-row{ display:flex; justify-content:center; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
-  .playback-btn{
-    background:var(--surface2); border:1px solid var(--border); color:var(--text);
-    border-radius:10px; padding:10px 16px; font-size:.85rem; cursor:pointer;
-  }
-
-  .rate-heading{ font-size:.88rem; color:var(--text-dim2); margin-bottom:12px; }
-  .rate-row{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:6px; }
-  .rate-btn{
-    border:1px solid var(--border); background:var(--surface2); color:var(--text);
-    border-radius:10px; padding:10px 14px; font-size:.85rem; cursor:pointer;
-  }
-  .rate-btn.excellent{ border-color:var(--green); color:var(--green); }
-  .rate-btn.close{ border-color:var(--gold-soft); color:var(--gold-soft); }
-  .rate-btn.retry{ border-color:var(--brick); color:var(--brick); }
-
-  .verdict{ font-size:1rem; font-weight:800; text-align:center; margin:16px 0 4px; display:none; }
-  .verdict.shown{ display:block; }
+  .result-heard{ font-size:.9rem; color:var(--text-dim2); margin-bottom:10px; }
+  .result-heard b{ color:var(--text); }
+  .score-bar-wrap{ height:10px; background:var(--surface2); border-radius:5px; overflow:hidden; margin-bottom:10px; }
+  .score-bar{ height:100%; border-radius:5px; transition:width .4s ease; }
+  .verdict{ font-size:1rem; font-weight:800; text-align:center; margin-bottom:4px; }
   .verdict.excellent{ color:var(--green); }
   .verdict.close{ color:var(--gold-soft); }
   .verdict.retry{ color:var(--brick); }
+  .score-num{ text-align:center; font-size:.82rem; color:var(--text-dim3); margin-bottom:16px; }
 
-  .action-row{ display:flex; gap:10px; justify-content:center; margin-top:14px; }
+  .action-row{ display:flex; gap:10px; justify-content:center; margin-top:10px; }
 
   .error-box{ display:none; margin-top:18px; color:var(--brick); font-size:.88rem; text-align:center; }
   .error-box.shown{ display:block; }
@@ -92,7 +79,7 @@
 <div class="stars"></div>
 
 <div class="app-header">
-  <a class="icon-circle" href="#" onclick="goBackToApp(); return false;" aria-label="الرئيسية">←</a>
+  <a class="icon-circle" href="index.html" onclick="ruSignalBack(event)" aria-label="الرئيسية">←</a>
   <div class="stats" id="statsBar"></div>
   <button class="theme-toggle" id="themeToggleBtn" onclick="ruToggleTheme()" aria-label="تبديل الوضع الليلي">🌙</button>
 </div>
@@ -100,11 +87,11 @@
 <div class="wrap has-bottom-nav">
   <div class="page-head">
     <h1>تدريب النطق 🎤</h1>
-    <p>اسمع الكلمة، قولها بصوتك، اسمع نفسك، وقيّم نطقك بنفسك</p>
+    <p>اسمع الكلمة، قولها بصوتك، وشوف تقييمك فوراً</p>
   </div>
 
   <div class="support-warning" id="supportWarning">
-    ⚠️ الجهاز/المتصفح ده مش بيدعم تسجيل الصوت.
+    ⚠️ المتصفح ده مش بيدعم خاصية التعرف على الصوت. جرب تفتح الصفحة في Chrome على الموبايل أو الكمبيوتر.
   </div>
 
   <div class="practice-card">
@@ -115,27 +102,17 @@
     <button class="listen-btn" onclick="playTarget()">🔊 اسمع النطق الصح الأول</button>
 
     <div>
-      <button class="mic-btn" id="micBtn" onclick="toggleRecording()">🎤</button>
-      <div class="mic-hint" id="micHint">دوس وقول الكلمة، ودوس تاني عشان توقف التسجيل</div>
+      <button class="mic-btn" id="micBtn" onclick="startCheck()">🎤</button>
+      <div class="mic-hint">دوس وقول الكلمة بصوت عالي وواضح</div>
     </div>
 
     <div class="error-box" id="errorBox"></div>
 
     <div class="result-box" id="resultBox">
-      <div class="playback-row">
-        <button class="playback-btn" onclick="playRecording()">▶️ اسمع تسجيلك</button>
-        <button class="playback-btn" onclick="playTarget()">🔊 اسمع النطق الصحيح</button>
-      </div>
-
-      <div class="rate-heading">إيه رأيك في نطقك؟</div>
-      <div class="rate-row">
-        <button class="rate-btn excellent" onclick="rate('excellent')">🎉 ممتاز</button>
-        <button class="rate-btn close" onclick="rate('close')">👍 قريب</button>
-        <button class="rate-btn retry" onclick="rate('retry')">🔁 محتاج تمرين</button>
-      </div>
-
+      <div class="result-heard">سمعتك بتقول: <b id="heardText"></b></div>
+      <div class="score-bar-wrap"><div class="score-bar" id="scoreBar"></div></div>
       <div class="verdict" id="verdictText"></div>
-
+      <div class="score-num" id="scoreNum"></div>
       <div class="action-row">
         <button class="cta" onclick="nextWord()">الكلمة الجاية ←</button>
       </div>
@@ -149,13 +126,11 @@
 </div>
 
 <nav class="bottom-nav">
-  <a href="#" onclick="goBackToApp(); return false;"><span class="tab-icon">🏠</span><span>الرئيسية</span></a>
+  <a href="index.html"><span class="tab-icon">🏠</span><span>الرئيسية</span></a>
   <a href="letters.html"><span class="tab-icon">🔤</span><span>الحروف</span></a>
   <a href="vocabulary.html"><span class="tab-icon">📚</span><span>المفردات</span></a>
   <a class="disabled" href="#"><span class="tab-icon">🏅</span><span>إنجازاتي</span><span class="dot"></span></a>
 </nav>
-
-<audio id="recPlayer" style="display:none"></audio>
 
 <script src="progress.js"></script>
 <script src="theme.js"></script>
@@ -165,7 +140,7 @@
 <script>
 ruRenderStatsBar("statsBar");
 
-if (!ruMicSupported()) {
+if (!ruSpeechSupported()) {
   document.getElementById("supportWarning").classList.add("show");
   document.getElementById("micBtn").disabled = true;
 }
@@ -175,19 +150,6 @@ let current = null;
 let attempts = 0;
 let scoreSum = 0;
 
-let isRecording = false;
-let stopRecordingFn = null;
-let lastRecordingUrl = null;
-
-// يرجّع للتطبيق (Kodular) لو الصفحة شغالة جواه، أو للرئيسية لو فتحتها من متصفح
-function goBackToApp(){
-  if (window.AppInventor && window.AppInventor.setWebViewString) {
-    window.AppInventor.setWebViewString('back');
-  } else {
-    location.href = 'index.html';
-  }
-}
-
 function loadPool(){
   pool = [...ruAllVocabWords()].sort(() => Math.random()-0.5);
 }
@@ -195,7 +157,6 @@ function loadPool(){
 function nextWord(){
   document.getElementById("resultBox").classList.remove("shown");
   document.getElementById("errorBox").classList.remove("shown");
-  document.getElementById("verdictText").classList.remove("shown");
   if (pool.length === 0) loadPool();
   current = pool.pop();
   document.getElementById("targetRu").textContent = current.ru;
@@ -207,85 +168,74 @@ function playTarget(){
   if (current) ruPlayAudio(current.ru);
 }
 
-function playRecording(){
-  if (!lastRecordingUrl) return;
-  const player = document.getElementById("recPlayer");
-  const eb = document.getElementById("errorBox");
-  eb.classList.remove("shown");
-  player.src = lastRecordingUrl;
-  const p = player.play();
-  if (p && p.catch) {
-    p.catch(() => {
-      eb.textContent = "الجهاز ده مش قادر يشغّل التسجيل. جرب تحدّث التطبيق.";
-      eb.classList.add("shown");
-    });
-  }
-  player.onerror = () => {
-    eb.textContent = "الجهاز ده مش قادر يشغّل التسجيل. جرب تحدّث التطبيق.";
-    eb.classList.add("shown");
-  };
-}
-
-function toggleRecording(){
+function startCheck(){
   const micBtn = document.getElementById("micBtn");
-  const hint = document.getElementById("micHint");
   document.getElementById("errorBox").classList.remove("shown");
+  micBtn.classList.add("listening");
 
-  if (!isRecording){
-    // ابدأ تسجيل جديد
-    document.getElementById("resultBox").classList.remove("shown");
-    document.getElementById("verdictText").classList.remove("shown");
-
-    stopRecordingFn = ruStartRecording({
-      onStart: () => {
-        isRecording = true;
-        micBtn.classList.add("listening");
-        hint.textContent = "بيسجل الآن... دوس تاني عشان توقف";
-      },
-      onStop: (url) => {
-        isRecording = false;
-        micBtn.classList.remove("listening");
-        hint.textContent = "دوس وقول الكلمة، ودوس تاني عشان توقف التسجيل";
-        lastRecordingUrl = url;
-        document.getElementById("resultBox").classList.add("shown");
-      },
-      onError: (msg) => {
-        isRecording = false;
-        micBtn.classList.remove("listening");
-        const eb = document.getElementById("errorBox");
-        eb.textContent = msg;
-        eb.classList.add("shown");
-      }
-    });
-  } else {
-    // وقف التسجيل الحالي
-    if (stopRecordingFn) stopRecordingFn();
-  }
+  ruCheckPronunciation(current.ru, {
+    onStart: () => {},
+    onResult: (res) => {
+      micBtn.classList.remove("listening");
+      showResult(res);
+    },
+    onError: (msg) => {
+      micBtn.classList.remove("listening");
+      const eb = document.getElementById("errorBox");
+      eb.textContent = msg;
+      eb.classList.add("shown");
+    },
+    onEnd: () => { micBtn.classList.remove("listening"); }
+  });
 }
 
-function rate(verdict){
+function showResult(res){
   attempts++;
-  const scoreMap = { excellent: 95, close: 70, retry: 35 };
-  scoreSum += scoreMap[verdict];
+  scoreSum += res.score;
   document.getElementById("attemptsNum").textContent = attempts;
   document.getElementById("avgNum").textContent = Math.round(scoreSum/attempts) + "%";
 
-  const verdictMap = {
-    excellent: "🎉 ممتاز! نطق قريب جداً",
-    close:     "👍 قريب، بس فيه مجال تحسّن",
-    retry:     "🔁 جرب تاني، ركّز على كل حرف"
-  };
-  const verdictEl = document.getElementById("verdictText");
-  verdictEl.textContent = verdictMap[verdict];
-  verdictEl.className = "verdict shown " + verdict;
+  document.getElementById("heardText").textContent = res.transcript;
+  document.getElementById("scoreBar").style.width = res.score + "%";
 
-  if (verdict === "excellent") RuProgress.addXp(8, "pronunciation_excellent");
-  else if (verdict === "close") RuProgress.addXp(4, "pronunciation_close");
+  const verdictMap = {
+    excellent: { text: "🎉 ممتاز! نطق قريب جداً", color: "var(--green)" },
+    close:     { text: "👍 قريب، بس فيه مجال تحسّن", color: "var(--gold-soft)" },
+    retry:     { text: "🔁 جرب تاني، ركّز على كل حرف", color: "var(--brick)" }
+  };
+  const v = verdictMap[res.verdict];
+  const verdictEl = document.getElementById("verdictText");
+  verdictEl.textContent = v.text;
+  verdictEl.className = "verdict " + res.verdict;
+  document.getElementById("scoreBar").style.background = v.color;
+  document.getElementById("scoreNum").textContent = "نسبة التطابق: " + res.score + "%";
+
+  document.getElementById("resultBox").classList.add("shown");
+
+  if (res.verdict === "excellent") RuProgress.addXp(8, "pronunciation_excellent");
+  else if (res.verdict === "close") RuProgress.addXp(4, "pronunciation_close");
   ruRenderStatsBar("statsBar");
 }
 
 loadPool();
 nextWord();
+
+/* ===================== ربط Kodular: إشارة للتطبيق يفتح شاشة الميكروفون المخصصة ===================== */
+if (window.AppInventor) {
+  // بنضيف وقت فريد في الآخر عشان الإشارة تتسجل كـ"تغيير" في كل مرة تفتح فيها الصفحة،
+  // حتى لو كانت نفس الإشارة من قبل. البلوك في Kodular بيدوّر على "contains open_pronunciation"
+  // فمش هيتأثر بالإضافة دي.
+  try { window.AppInventor.setWebViewString("open_pronunciation:" + Date.now()); } catch(e) {}
+}
+function ruSignalBack(e){
+  if (window.AppInventor) {
+    try {
+      e.preventDefault();
+      window.AppInventor.setWebViewString("back");
+    } catch(err) {}
+  }
+  // لو مش جوه التطبيق (كروم عادي)، الرابط العادي هيشتغل زي ما هو
+}
 </script>
 </body>
 </html>
