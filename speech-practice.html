@@ -94,6 +94,8 @@
     ⚠️ المتصفح ده مش بيدعم خاصية التعرف على الصوت. جرب تفتح الصفحة في Chrome على الموبايل أو الكمبيوتر.
   </div>
 
+  <div class="diag-box" id="diagBox" style="display:none; margin-top:14px; padding:10px 14px; font-size:.75rem; background:rgba(166,69,63,.1); border:1px solid rgba(166,69,63,.35); border-radius:8px; color:var(--brick); direction:ltr; text-align:left; word-break:break-all;"></div>
+
   <div class="practice-card">
     <div class="target-ru" id="targetRu">—</div>
     <div class="target-tr" id="targetTr"></div>
@@ -132,11 +134,18 @@
   <a class="disabled" href="#"><span class="tab-icon">🏅</span><span>إنجازاتي</span><span class="dot"></span></a>
 </nav>
 
-<script src="progress.js"></script>
-<script src="theme.js"></script>
-<script src="audio.js"></script>
-<script src="vocab.js"></script>
-<script src="speech-check.js"></script>
+<script>
+  function ruShowLoadError(file){
+    const box = document.getElementById("diagBox");
+    box.style.display = "block";
+    box.textContent += (box.textContent ? " | " : "") + "FAILED TO LOAD: " + file;
+  }
+</script>
+<script src="progress.js" onerror="ruShowLoadError('progress.js')"></script>
+<script src="theme.js" onerror="ruShowLoadError('theme.js')"></script>
+<script src="audio.js" onerror="ruShowLoadError('audio.js')"></script>
+<script src="vocab.js" onerror="ruShowLoadError('vocab.js')"></script>
+<script src="speech-check.js" onerror="ruShowLoadError('speech-check.js')"></script>
 <script>
 ruRenderStatsBar("statsBar");
 
@@ -168,24 +177,34 @@ function playTarget(){
   if (current) ruPlayAudio(current.ru);
 }
 
+let ruIsListening = false;
+
 function startCheck(){
+  if (ruIsListening) return; // يمنع الضغط المتكرر اللي بيسبب "aborted"
+  ruIsListening = true;
+
   const micBtn = document.getElementById("micBtn");
   document.getElementById("errorBox").classList.remove("shown");
   micBtn.classList.add("listening");
 
+  // نوقف أي صوت تاني شغال (زي زرار اسمع النطق) قبل ما نبدأ نسجل
+  try { speechSynthesis.cancel(); } catch(e) {}
+
   ruCheckPronunciation(current.ru, {
     onStart: () => {},
     onResult: (res) => {
+      ruIsListening = false;
       micBtn.classList.remove("listening");
       showResult(res);
     },
     onError: (msg) => {
+      ruIsListening = false;
       micBtn.classList.remove("listening");
       const eb = document.getElementById("errorBox");
-      eb.textContent = msg;
+      eb.textContent = (msg.indexOf("aborted") !== -1) ? "اتقفلت المحاولة، جرب تاني وسيب شوية وقت بعد ما تدوس" : msg;
       eb.classList.add("shown");
     },
-    onEnd: () => { micBtn.classList.remove("listening"); }
+    onEnd: () => { ruIsListening = false; micBtn.classList.remove("listening"); }
   });
 }
 
@@ -217,8 +236,14 @@ function showResult(res){
   ruRenderStatsBar("statsBar");
 }
 
-loadPool();
-nextWord();
+try {
+  loadPool();
+  nextWord();
+} catch(e) {
+  const box = document.getElementById("diagBox");
+  box.style.display = "block";
+  box.textContent += (box.textContent ? " | " : "") + "JS ERROR: " + e.message;
+}
 
 /* ===================== ربط Kodular: إشارة للتطبيق يفتح شاشة الميكروفون المخصصة ===================== */
 if (window.AppInventor) {
