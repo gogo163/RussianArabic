@@ -60,9 +60,11 @@ function ruCheckPronunciation(targetText, callbacks){
   };
 
   rec.onerror = (e) => {
-    let msg = "حصلت مشكلة في التسجيل";
+    let msg = "حصلت مشكلة في التسجيل (" + e.error + ")";
     if (e.error === "not-allowed" || e.error === "permission-denied") msg = "محتاجين إذن استخدام الميكروفون";
     else if (e.error === "no-speech") msg = "معلش، مسمعتش صوت. جرب تاني";
+    else if (e.error === "audio-capture") msg = "مفيش ميكروفون متاح على الجهاز ده";
+    else if (e.error === "network") msg = "مشكلة في الاتصال بخدمة التعرف الصوتي (محتاجة إنترنت)";
     if (callbacks.onError) callbacks.onError(msg);
   };
 
