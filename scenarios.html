@@ -28,6 +28,8 @@
   .scenario-card h3{ font-size:1.05rem; color:var(--text); margin-bottom:3px; }
   .scenario-card p{ font-size:.8rem; color:var(--text-dim3); }
   .scenario-card .go{ margin-right:auto; color:var(--gold-soft); font-size:1.1rem; }
+  .level-title{ font-size:.92rem; font-weight:800; color:var(--text-dim); margin:10px 0 2px; }
+  .level-title span{ font-weight:400; font-size:.75rem; color:var(--text-dim4); }
 
   /* ---- conversation view ---- */
   .convo{ display:none; padding:20px 0 40px; }
@@ -111,9 +113,8 @@ let currentNodeId = null;
 let goodCount = 0;
 let totalChoices = 0;
 
-function renderGrid(){
-  const grid = document.getElementById("scenarioGrid");
-  grid.innerHTML = SCENARIOS.map(s => `
+function scenarioCardHtml(s){
+  return `
     <div class="scenario-card" onclick="openScenario('${s.id}')">
       <span class="icon">${s.icon}</span>
       <div>
@@ -121,8 +122,16 @@ function renderGrid(){
         <p>${s.intro}</p>
       </div>
       <span class="go">←</span>
-    </div>
-  `).join("");
+    </div>`;
+}
+
+function renderGrid(){
+  const grid = document.getElementById("scenarioGrid");
+  const beginner = SCENARIOS.filter(s => (s.level || "beginner") === "beginner");
+  const inter = SCENARIOS.filter(s => s.level === "intermediate");
+  grid.innerHTML =
+    `<div class="level-title">🟢 مستوى مبتدئ</div>` + beginner.map(scenarioCardHtml).join("") +
+    `<div class="level-title">🟡 مستوى متوسط <span>(جمل أطول وردود أكتر)</span></div>` + inter.map(scenarioCardHtml).join("");
 }
 
 function openScenario(id){

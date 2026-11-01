@@ -177,6 +177,46 @@
     </div>
   </section>
 
+  <section class="block">
+    <h2>الضمائر الشخصية</h2>
+    <p>دي الضمائر اللي هتستخدمها مع كل الأفعال. لاحظ إن "вы" بتتقال للجمع، وكمان للمفرد لما تخاطب شخص باحترام (زي "حضرتك").</p>
+    <div class="verb-card">
+      <h3>личные местоимения</h3>
+      <div class="meaning">الضمائر الشخصية</div>
+      <div id="pronTable"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>المصدر (الفعل الأساسي)</h2>
+    <p>المصدر هو الشكل الأساسي للفعل زي ما بتلاقيه في القاموس، وغالباً بينتهي بـ <b>ть</b>. بتستخدمه بعد أفعال زي "хочу" (عايز) و"могу" (أقدر)، وكمان هو الأساس اللي بتبني منه كل التصريفات.</p>
+    <div class="verb-card">
+      <h3>أفعال مهمة (مصدر)</h3>
+      <div class="meaning">اتعلمهم كأساس، بعد كده هتصرّفهم</div>
+      <div id="infTable"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>المستقبل</h2>
+    <p>أسهل طريقة للمستقبل: <b>буду / будешь / будет...</b> (تصريف "يكون") + <b>المصدر</b>. يعني بتقول "هكون أقرأ" بمعنى "هقرأ". ملحوظة: فيه شكل تاني للمستقبل مع الأفعال "التامة"، ده موضوع أعمق هنوصله بعد كده.</p>
+    <div class="verb-card">
+      <h3>читать <span style="color:var(--gold-soft); font-size:.85rem;">— في المستقبل</span></h3>
+      <div class="meaning">هقرأ</div>
+      <div id="futTable"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>الأمر</h2>
+    <p>الأمر بتستخدمه لما تطلب أو تقول لحد يعمل حاجة. له شكلين: للمفرد (ты) وللجمع أو الاحترام (вы) — شكل الـ"вы" هو نفسه المفرد + <b>те</b> في الآخر.</p>
+    <div class="verb-card">
+      <h3>أوامر شائعة</h3>
+      <div class="meaning">للمفرد ← وللجمع/الاحترام</div>
+      <div id="impTable"></div>
+    </div>
+  </section>
+
   <div class="finish-box">
     <p>القواعد موضوع كبير — هنوسّعه بتمارين أكتر لاحقاً، ده أساس البداية</p>
     <button class="cta" id="finishBtn" onclick="ruFinishSection()">فهمت الأساسيات ⭐</button>
@@ -295,6 +335,45 @@ const PAST_ROWS = [
   { p:"они (جمع)",  f:"говори<span class='end'>ли</span>", raw:"они говорили" }
 ];
 renderVerb("pastTable", PAST_ROWS);
+
+const PRON_ROWS = [
+  { p:"أنا",           f:"я",   raw:"я" },
+  { p:"انت",           f:"ты",  raw:"ты" },
+  { p:"هو",            f:"он",  raw:"он" },
+  { p:"هي",            f:"она", raw:"она" },
+  { p:"هو (محايد)",    f:"оно", raw:"оно" },
+  { p:"احنا",          f:"мы",  raw:"мы" },
+  { p:"انتو / حضرتك",  f:"вы",  raw:"вы" },
+  { p:"هم",            f:"они", raw:"они" }
+];
+renderVerb("pronTable", PRON_ROWS);
+
+const INF_ROWS = [
+  { p:"يقرأ",    f:"чита<span class='end'>ть</span>",    raw:"читать" },
+  { p:"يتكلم",   f:"говори<span class='end'>ть</span>",  raw:"говорить" },
+  { p:"يكتب",    f:"писа<span class='end'>ть</span>",    raw:"писать" },
+  { p:"يفهم",    f:"понима<span class='end'>ть</span>",  raw:"понимать" },
+  { p:"يعمل",    f:"дела<span class='end'>ть</span>",    raw:"делать" }
+];
+renderVerb("infTable", INF_ROWS);
+
+const FUT_ROWS = [
+  { p:"я",      f:"<span class='end'>буду</span> читать",  raw:"я буду читать" },
+  { p:"ты",     f:"<span class='end'>будешь</span> читать", raw:"ты будешь читать" },
+  { p:"он/она", f:"<span class='end'>будет</span> читать",  raw:"он будет читать" },
+  { p:"мы",     f:"<span class='end'>будем</span> читать",  raw:"мы будем читать" },
+  { p:"вы",     f:"<span class='end'>будете</span> читать", raw:"вы будете читать" },
+  { p:"они",    f:"<span class='end'>будут</span> читать",  raw:"они будут читать" }
+];
+renderVerb("futTable", FUT_ROWS);
+
+const IMP_ROWS = [
+  { p:"اقرأ / اقرأوا",   f:"чита<span class='end'>й</span> / чита<span class='end'>йте</span>", raw:"читай" },
+  { p:"اتكلم / اتكلموا", f:"говор<span class='end'>и</span> / говор<span class='end'>ите</span>", raw:"говори" },
+  { p:"اكتب / اكتبوا",   f:"пиш<span class='end'>и</span> / пиш<span class='end'>ите</span>",    raw:"пиши" },
+  { p:"امشي / امشوا",    f:"ид<span class='end'>и</span> / ид<span class='end'>ите</span>",      raw:"иди" }
+];
+renderVerb("impTable", IMP_ROWS);
 
 function showToast(msg){
   const t = document.getElementById("toast");
