@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ترجمة للروسية — تعلم الروسية بالعربي</title>
+<script>
+  (function(){
+    var t = localStorage.getItem("ru_arabi_theme");
+    if (t === "dark") document.documentElement.setAttribute("data-theme", "dark");
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .page-head{ padding:28px 0 8px; text-align:center; }
+  .page-head h1{ font-size:2rem; color:var(--gold-soft); margin-bottom:8px; }
+  .page-head p{ color:var(--text-dim2); font-size:.95rem; }
+
+  .start-card{
+    margin-top:24px; background:var(--surface); border:1px solid var(--border);
+    border-radius:14px; padding:24px 20px; text-align:center;
+  }
+  .start-card .big{ font-size:2.2rem; margin-bottom:10px; }
+  .start-card p{ font-size:.88rem; color:var(--text-dim2); margin-bottom:6px; }
+  .start-card .best{ font-size:.82rem; color:var(--gold-soft); margin:12px 0 18px; }
+
+  .tr-view{ display:none; padding:18px 0 40px; }
+  .tr-view.open{ display:block; }
+  .tr-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .tr-top button{ background:none; border:none; color:var(--text-dim3); font-size:1.1rem; cursor:pointer; }
+  .tr-top .count{ font-size:.85rem; color:var(--text-dim3); }
+  .tr-top .score{ font-size:.85rem; color:var(--text-dim2); }
+
+  .tr-bar-wrap{ height:6px; background:var(--surface2); border-radius:3px; overflow:hidden; margin-bottom:22px; }
+  .tr-bar{ height:100%; background:var(--gold); width:0%; transition:width .3s ease; }
+
+  .tr-level{ text-align:center; font-size:.72rem; color:var(--text-dim4); margin-bottom:6px; }
+  .tr-prompt-label{ text-align:center; font-size:.82rem; color:var(--text-dim3); }
+  .tr-prompt{
+    text-align:center; font-size:1.5rem; font-weight:800; color:var(--gold-soft);
+    margin:8px 0 22px; line-height:1.6;
+  }
+
+  .tr-answer{
+    direction:ltr; min-height:64px; display:flex; flex-wrap:wrap; gap:8px; align-content:flex-start;
+    background:var(--surface3); border:1px dashed var(--border); border-radius:10px;
+    padding:12px; margin-bottom:16px;
+  }
+  .tr-answer .placeholder{ color:var(--text-dim4); font-size:.82rem; direction:rtl; width:100%; text-align:center; align-self:center; }
+  .tr-pool{ direction:ltr; display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:20px; }
+  .tr-chip{
+    font-family:'Aref Ruqaa', serif; font-size:1.15rem; color:var(--text);
+    background:var(--surface2); border:1px solid var(--border); border-radius:8px;
+    padding:8px 14px; cursor:pointer; user-select:none;
+  }
+  .tr-chip.used{ opacity:.2; pointer-events:none; }
+  .tr-chip.placed{ background:rgba(212,169,79,.14); border-color:rgba(212,169,79,.4); }
+
+  .tr-actions{ display:flex; gap:10px; justify-content:center; }
+  .tr-feedback{ text-align:center; margin-top:18px; }
+  .tr-feedback .verdict{ font-size:1.05rem; font-weight:800; margin-bottom:6px; }
+  .tr-feedback .verdict.good{ color:var(--green); }
+  .tr-feedback .verdict.bad{ color:var(--brick); }
+  .tr-feedback .answer{ font-family:'Aref Ruqaa', serif; font-size:1.35rem; color:var(--text); direction:ltr; margin-bottom:10px; }
+  .tr-feedback .play{
+    background:var(--surface2); border:1px solid var(--border); color:var(--text);
+    padding:8px 18px; border-radius:18px; cursor:pointer; font-size:.88rem; margin-bottom:14px;
+  }
+
+  .result-box{ text-align:center; padding:20px 0; }
+  .result-box .big{ font-size:2.4rem; margin-bottom:10px; }
+  .result-box .score-num{ font-family:'Aref Ruqaa', serif; font-size:2rem; color:var(--gold-soft); margin-bottom:6px; }
+  .result-box p{ font-size:.9rem; color:var(--text-dim2); margin-bottom:20px; }
+  .result-actions{ display:flex; gap:10px; justify-content:center; }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+
+<div class="app-header">
+  <a class="icon-circle" href="index.html" aria-label="الرئيسية">←</a>
+  <div class="stats" id="statsBar"></div>
+  <button class="theme-toggle" id="themeToggleBtn" onclick="ruToggleTheme()" aria-label="تبديل الوضع الليلي">🌙</button>
+</div>
+
+<div class="wrap has-bottom-nav">
+  <div class="page-head">
+    <h1>ترجمة للروسية ✍️</h1>
+    <p>اقرأ الجملة بالعربي، وركّبها بالروسي من الكلمات</p>
+  </div>
+
+  <div class="start-card" id="startCard">
+    <div class="big">🔤➡️🇷🇺</div>
+    <p>١٠ جمل عشوائية، من البسيط للأصعب</p>
+    <p>فيه كلمات زيادة مش من الجملة، لازم تختار صح!</p>
+    <div class="best" id="bestLine"></div>
+    <button class="cta" onclick="startRound()">ابدأ</button>
+  </div>
+
+  <div class="tr-view" id="trView">
+    <div class="tr-top">
+      <button onclick="exitRound()">✕</button>
+      <span class="count" id="trCount">1/10</span>
+      <span class="score">النقط: <b id="trScore">0</b></span>
+    </div>
+    <div class="tr-bar-wrap"><div class="tr-bar" id="trBar"></div></div>
+    <div id="trBody"></div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <a href="index.html"><span class="tab-icon">🏠</span><span>الرئيسية</span></a>
+  <a href="letters.html"><span class="tab-icon">🔤</span><span>الحروف</span></a>
+  <a href="vocabulary.html"><span class="tab-icon">📚</span><span>المفردات</span></a>
+  <a class="disabled" href="#"><span class="tab-icon">🏅</span><span>إنجازاتي</span><span class="dot"></span></a>
+</nav>
+
+<script src="progress.js"></script>
+<script src="theme.js"></script>
+<script src="audio.js"></script>
+<script>
+ruRenderStatsBar("statsBar");
+
+/* level 1 = بسيط، level 2 = أطول. extra = كلمات مشتّتة. end = علامة ترقيم في الآخر */
+const TR_BANK = [
+  { ar:"أنا طالب",                 ru:"Я студент",                  extra:["учитель","он"], level:1 },
+  { ar:"شكراً على المساعدة",       ru:"Спасибо за помощь",          extra:["пожалуйста","привет"], level:1 },
+  { ar:"فين المحطة؟",              ru:"Где вокзал",                 extra:["туалет","как"], level:1, end:"?" },
+  { ar:"ده بكام؟",                 ru:"Сколько это стоит",          extra:["где","такси"], level:1, end:"?" },
+  { ar:"أنا مش فاهم",              ru:"Я не понимаю",               extra:["хорошо","да"], level:1 },
+  { ar:"محتاج تاكسي",              ru:"Мне нужно такси",            extra:["билет","я"], level:1 },
+  { ar:"اسمي أحمد",                ru:"Меня зовут Ахмед",           extra:["как","вас"], level:1 },
+  { ar:"أنا من مصر",               ru:"Я из Египта",                extra:["он","в"], level:1 },
+  { ar:"فين الحمام؟",              ru:"Где туалет",                 extra:["вокзал","здесь"], level:1, end:"?" },
+  { ar:"أشوفك بكرة",               ru:"До завтра",                  extra:["сегодня","привет"], level:1 },
+  { ar:"أنا بدرس اللغة الروسية",   ru:"Я изучаю русский язык",      extra:["читаю","книга"], level:2 },
+  { ar:"ده غالي أوي",              ru:"Это слишком дорого",         extra:["дёшево","очень"], level:2 },
+  { ar:"عندي سؤال",                ru:"У меня есть вопрос",         extra:["ответ","нет"], level:2 },
+  { ar:"ممكن أشوف؟",               ru:"Можно посмотреть",           extra:["купить","нельзя"], level:2, end:"?" },
+  { ar:"هو بيقرأ كتاب",            ru:"Он читает книгу",            extra:["книга","читать"], level:2 },
+  { ar:"احنا هنتكلم روسي",         ru:"Мы будем говорить по-русски",extra:["говорим","русский"], level:2 },
+  { ar:"أنا عايز قهوة",            ru:"Я хочу кофе",                extra:["чай","хочет"], level:2 },
+  { ar:"هي كانت في البيت",         ru:"Она была дома",              extra:["был","дом"], level:2 },
+  { ar:"المترو قريب",              ru:"Метро близко",               extra:["далеко","где"], level:2 },
+  { ar:"أنا بحب روسيا",            ru:"Я люблю Россию",             extra:["любишь","Россия"], level:2 }
+];
+
+function shuffle(a){
+  const r=[...a];
+  for(let i=r.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [r[i],r[j]]=[r[j],r[i]]; }
+  return r;
+}
+
+const BEST_KEY = "ru_arabi_games_best";
+function loadBest(){ try{ return JSON.parse(localStorage.getItem(BEST_KEY))||{}; }catch(e){ return {}; } }
+function renderBest(){
+  const b = loadBest().tr || 0;
+  document.getElementById("bestLine").textContent = b ? ("أفضل نتيجة: " + b) : "";
+}
+renderBest();
+
+let round = [], idx = 0, score = 0, placed = [], current = null, answered = false;
+
+function startRound(){
+  // ٥ من المستوى الأول + ٥ من الثاني، الأسهل الأول
+  const l1 = shuffle(TR_BANK.filter(q=>q.level===1)).slice(0,5);
+  const l2 = shuffle(TR_BANK.filter(q=>q.level===2)).slice(0,5);
+  round = [...l1, ...l2];
+  idx = 0; score = 0;
+  document.getElementById("trScore").textContent = 0;
+  document.getElementById("startCard").style.display = "none";
+  document.getElementById("trView").classList.add("open");
+  nextQuestion();
+}
+
+function exitRound(){
+  document.getElementById("trView").classList.remove("open");
+  document.getElementById("startCard").style.display = "";
+  renderBest();
+}
+
+function nextQuestion(){
+  if (idx >= round.length) { finishRound(); return; }
+  current = round[idx]; placed = []; answered = false;
+  document.getElementById("trCount").textContent = (idx+1) + "/" + round.length;
+  document.getElementById("trBar").style.width = Math.round(idx/round.length*100) + "%";
+
+  const tokens = current.ru.split(" ");
+  const chips = shuffle([...tokens, ...current.extra].map((w,i)=>({w, id:i})));
+
+  document.getElementById("trBody").innerHTML = `
+    <div class="tr-level">${current.level===1 ? "🟢 بسيط" : "🟡 أطول"}</div>
+    <div class="tr-prompt-label">ترجم للروسي:</div>
+    <div class="tr-prompt">${current.ar}</div>
+    <div class="tr-answer" id="trAnswer"><span class="placeholder">دوس على الكلمات بالترتيب</span></div>
+    <div class="tr-pool" id="trPool"></div>
+    <div class="tr-actions" id="trActions">
+      <button class="btn-ghost" onclick="clearAnswer()">مسح</button>
+      <button class="cta" style="padding:12px 34px;" onclick="checkAnswer()">تحقق</button>
+    </div>
+    <div class="tr-feedback" id="trFeedback"></div>
+  `;
+  const pool = document.getElementById("trPool");
+  chips.forEach(c => {
+    const el = document.createElement("span");
+    el.className = "tr-chip";
+    el.textContent = c.w;
+    el.dataset.id = c.id;
+    el.onclick = () => placeChip(el, c);
+    pool.appendChild(el);
+  });
+}
+
+function renderPlaced(){
+  const box = document.getElementById("trAnswer");
+  box.innerHTML = "";
+  if (placed.length === 0) {
+    box.innerHTML = '<span class="placeholder">دوس على الكلمات بالترتيب</span>';
+    return;
+  }
+  placed.forEach((p, i) => {
+    const el = document.createElement("span");
+    el.className = "tr-chip placed";
+    el.textContent = p.w;
+    el.onclick = () => removeChip(i);   // دوس عليها تشيلها
+    box.appendChild(el);
+  });
+}
+
+function placeChip(el, c){
+  if (answered || el.classList.contains("used")) return;
+  el.classList.add("used");
+  placed.push({ w:c.w, id:c.id, el });
+  renderPlaced();
+}
+
+function removeChip(i){
+  if (answered) return;
+  const p = placed.splice(i,1)[0];
+  p.el.classList.remove("used");
+  renderPlaced();
+}
+
+function clearAnswer(){
+  if (answered) return;
+  placed.forEach(p => p.el.classList.remove("used"));
+  placed = [];
+  renderPlaced();
+}
+
+function checkAnswer(){
+  if (answered || placed.length === 0) return;
+  answered = true;
+  const built = placed.map(p=>p.w).join(" ");
+  const ok = built === current.ru;
+  if (ok) score += 10;
+  document.getElementById("trScore").textContent = score;
+
+  const full = current.ru + (current.end || "");
+  document.getElementById("trActions").style.display = "none";
+  document.getElementById("trFeedback").innerHTML = `
+    <div class="verdict ${ok?'good':'bad'}">${ok ? "✓ ترجمة صح! 🎉" : "✗ الترجمة الصح:"}</div>
+    <div class="answer">${full}</div>
+    <div><button class="play" onclick="ruPlayAudio('${full.replace(/'/g,"\\'")}')">🔊 اسمعها</button></div>
+    <button class="cta" style="padding:12px 34px;" onclick="idx++; nextQuestion();">${idx+1>=round.length ? "النتيجة" : "التالي ←"}</button>
+  `;
+  ruPlayAudio(full);
+}
+
+function finishRound(){
+  document.getElementById("trBar").style.width = "100%";
+  const xp = Math.round(score/3);
+  RuProgress.addXp(xp, "translate_round");
+  RuProgress.markSectionComplete("translate");
+  ruRenderStatsBar("statsBar");
+  const best = loadBest();
+  if (!best.tr || score > best.tr) { best.tr = score; localStorage.setItem(BEST_KEY, JSON.stringify(best)); }
+  const correct = score/10;
+  const emoji = correct >= 9 ? "🏆" : correct >= 7 ? "🎉" : correct >= 4 ? "👍" : "💪";
+  document.getElementById("trBody").innerHTML = `
+    <div class="result-box">
+      <div class="big">${emoji}</div>
+      <div class="score-num">${correct} / ${round.length}</div>
+      <p>ترجمت ${correct} جمل صح من ${round.length} — كسبت ${xp} XP</p>
+      <div class="result-actions">
+        <button class="cta" onclick="startRound()">جولة جديدة</button>
+        <button class="btn-ghost" onclick="exitRound()">رجوع</button>
+      </div>
+    </div>`;
+}
+</script>
+</body>
+</html>

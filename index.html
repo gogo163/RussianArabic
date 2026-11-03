@@ -234,6 +234,13 @@
         <div class="side text"><h3>ألعاب سريعة</h3><p id="gamesNodeDesc">تحدي الوقت، تجميع الجمل، الأذن الذهبية</p></div>
       </div>
     </a>
+
+    <a class="node-link" href="translate.html">
+      <div class="node" id="translateNode">
+        <div class="side marker">✍️</div>
+        <div class="side text"><h3>ترجمة للروسية</h3><p id="translateNodeDesc">ترجم الجملة بنفسك — المستوى الاحترافي</p></div>
+      </div>
+    </a>
   </div>
 </div>
 
@@ -324,6 +331,10 @@
 
   document.getElementById("speechNode").classList.add("active");
   document.getElementById("gamesNode").classList.add("active");
+  document.getElementById("translateNode").classList.add(s.sections && s.sections.translate ? "done" : "active");
+  if (s.sections && s.sections.translate) {
+    document.getElementById("translateNodeDesc").textContent = "جربتها ✓ — العب تاني";
+  }
 
   if (learnedCount > 0 && learnedCount < 33) {
     document.querySelector("#continueCard .txt p").textContent = "كمّل — باقيلك " + (33 - learnedCount) + " حرف";
