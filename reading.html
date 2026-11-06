@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تمارين القراءة — تعلم الروسية بالعربي</title>
+<script>
+  (function(){
+    var t = localStorage.getItem("ru_arabi_theme");
+    if (t === "dark") document.documentElement.setAttribute("data-theme", "dark");
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .page-head{ padding:28px 0 8px; text-align:center; }
+  .page-head h1{ font-size:2rem; color:var(--gold-soft); margin-bottom:8px; }
+  .page-head p{ color:var(--text-dim2); font-size:.95rem; }
+
+  .view{ display:none; }
+  .view.open{ display:block; }
+
+  .level-title{ font-size:.92rem; font-weight:800; color:var(--text-dim); margin:22px 0 10px; }
+  .text-card{
+    display:flex; align-items:center; gap:14px; margin-bottom:10px;
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:14px 16px; cursor:pointer;
+  }
+  .text-card.done{ border-color:var(--green); }
+  .text-card .icon{ font-size:1.7rem; flex:none; }
+  .text-card h3{ font-size:1rem; color:var(--text); margin-bottom:2px; }
+  .text-card p{ font-size:.76rem; color:var(--text-dim3); }
+  .text-card .score{ margin-right:auto; font-size:.8rem; color:var(--green); font-weight:800; }
+
+  .topbar-row{ display:flex; align-items:center; justify-content:space-between; padding:16px 0 6px; }
+  .topbar-row .title{ font-family:'Aref Ruqaa', serif; font-size:1.4rem; color:var(--gold-soft); }
+  .lvl-tag{ font-size:.7rem; color:var(--ice); border:1px solid var(--border); border-radius:10px; padding:2px 10px; margin-right:8px; }
+
+  .toolbar{ display:flex; gap:10px; margin:10px 0 16px; }
+
+  .sent{
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:12px 14px; margin-bottom:8px; cursor:pointer; position:relative;
+  }
+  .sent-ru{ font-family:'Aref Ruqaa', serif; font-size:1.25rem; color:var(--text); line-height:1.7; padding-left:44px; direction:ltr; text-align:left; }
+  .sent-ar{ display:none; font-size:.88rem; color:var(--text-dim2); margin-top:6px; border-top:1px dashed var(--border); padding-top:6px; }
+  .sent.show .sent-ar, .all-show .sent-ar{ display:block; }
+  .sent .play{
+    position:absolute; left:10px; top:10px; width:34px; height:34px; border-radius:50%;
+    background:var(--surface2); border:1px solid var(--border); color:var(--text); cursor:pointer; font-size:.9rem;
+  }
+
+  .gloss{ margin:18px 0; background:var(--surface3); border-right:3px solid var(--gold); border-radius:6px; padding:12px 16px; }
+  .gloss h4{ font-size:.85rem; color:var(--gold-soft); margin-bottom:6px; }
+  .gloss .g{ display:flex; justify-content:space-between; gap:10px; font-size:.88rem; padding:3px 0; color:var(--text-dim); }
+  .gloss .g .r{ font-family:'Aref Ruqaa', serif; direction:ltr; color:var(--text); }
+
+  .q-count{ font-size:.8rem; color:var(--text-dim3); margin:14px 0 6px; }
+  .bar{ height:6px; background:var(--surface2); border-radius:3px; overflow:hidden; margin-bottom:18px; }
+  .bar-fill{ height:100%; background:var(--gold); width:0; transition:width .3s ease; }
+  .q-text{ font-size:1.15rem; color:var(--text); margin-bottom:16px; line-height:1.7; }
+  .opts{ display:flex; flex-direction:column; gap:10px; }
+  .opt{
+    text-align:right; font-family:'Tajawal',sans-serif; font-size:.95rem;
+    background:var(--surface); border:1px solid var(--border); color:var(--text);
+    padding:14px 16px; border-radius:10px; cursor:pointer;
+  }
+  .opt.correct{ border-color:var(--green); background:rgba(63,122,87,.18); }
+  .opt.wrong{ border-color:var(--brick); background:rgba(139,53,48,.18); }
+  .opt:disabled{ cursor:default; }
+  .next-row{ margin-top:18px; text-align:left; }
+
+  .result-box{ text-align:center; padding:26px 0; }
+  .result-box .big{ font-size:2.4rem; margin-bottom:8px; }
+  .result-box .num{ font-family:'Aref Ruqaa', serif; font-size:2rem; color:var(--gold-soft); margin-bottom:6px; }
+  .result-box p{ font-size:.9rem; color:var(--text-dim2); margin-bottom:20px; }
+  .result-actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+
+<div class="app-header">
+  <a class="icon-circle" href="index.html" aria-label="الرئيسية">←</a>
+  <div class="stats" id="statsBar"></div>
+  <button class="theme-toggle" id="themeToggleBtn" onclick="ruToggleTheme()" aria-label="تبديل الوضع الليلي">🌙</button>
+</div>
+
+<div class="wrap has-bottom-nav">
+
+  <!-- قايمة النصوص -->
+  <div class="view open" id="listView">
+    <div class="page-head">
+      <h1>تمارين القراءة 📰</h1>
+      <p>اقرا النص، اسمعه، افهمه، وجاوب على الأسئلة</p>
+    </div>
+    <div id="listBody"></div>
+  </div>
+
+  <!-- عرض النص -->
+  <div class="view" id="textView">
+    <div class="topbar-row">
+      <div><span class="title" id="tvTitle"></span><span class="lvl-tag" id="tvLevel"></span></div>
+      <button class="btn-ghost" onclick="backToList()">← النصوص</button>
+    </div>
+    <div class="toolbar">
+      <button class="btn-ghost" id="toggleAllBtn" onclick="toggleAll()">إظهار كل الترجمة</button>
+    </div>
+    <div style="font-size:.78rem; color:var(--text-dim4); margin-bottom:10px;">دوس على أي جملة تشوف ترجمتها، ودوس 🔊 تسمعها</div>
+    <div id="sentList"></div>
+    <div class="gloss" id="gloss"></div>
+    <div style="text-align:center; margin:22px 0 10px;">
+      <button class="cta" onclick="startQuiz()">اختبر فهمك ✓</button>
+    </div>
+  </div>
+
+  <!-- الأسئلة -->
+  <div class="view" id="quizView">
+    <div class="topbar-row">
+      <div class="title" id="qvTitle"></div>
+      <button class="btn-ghost" onclick="openText(currentId)">← النص</button>
+    </div>
+    <div class="q-count" id="qCount"></div>
+    <div class="bar"><div class="bar-fill" id="qBar"></div></div>
+    <div class="q-text" id="qText"></div>
+    <div class="opts" id="qOpts"></div>
+    <div class="next-row" id="qNext"></div>
+  </div>
+
+  <!-- النتيجة -->
+  <div class="view" id="resultView">
+    <div class="result-box" id="resultBox"></div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <a href="index.html"><span class="tab-icon">🏠</span><span>الرئيسية</span></a>
+  <a href="letters.html"><span class="tab-icon">🔤</span><span>الحروف</span></a>
+  <a href="vocabulary.html"><span class="tab-icon">📚</span><span>المفردات</span></a>
+  <a class="disabled" href="#"><span class="tab-icon">🏅</span><span>إنجازاتي</span><span class="dot"></span></a>
+</nav>
+
+<script src="progress.js"></script>
+<script src="theme.js"></script>
+<script src="audio.js"></script>
+<script>
+ruRenderStatsBar("statsBar");
+
+/* ===================== نصوص القراءة ===================== */
+const READING = [
+  { id:"r1", level:"A1", title:"اسمي أحمد", icon:"👋",
+    sentences:[
+      { ru:"Меня зовут Ахмед.", ar:"اسمي أحمد." },
+      { ru:"Я из Египта.", ar:"أنا من مصر." },
+      { ru:"Я студент.", ar:"أنا طالب." },
+      { ru:"Я учусь в университете в Москве.", ar:"أنا بدرس في جامعة في موسكو." },
+      { ru:"Я изучаю русский язык.", ar:"أنا بدرس اللغة الروسية." },
+      { ru:"Я очень люблю Россию.", ar:"أنا بحب روسيا أوي." }
+    ],
+    glossary:[ { ru:"учусь", ar:"بدرس / بتعلم (في مكان)" }, { ru:"очень", ar:"أوي / جداً" } ],
+    questions:[
+      { q:"أحمد من أنهي بلد؟", options:["روسيا","مصر","موسكو"], answer:1 },
+      { q:"أحمد بيدرس فين؟", options:["في مدرسة في القاهرة","في شغل","في جامعة في موسكو"], answer:2 },
+      { q:"أحمد بيتعلم إيه؟", options:["اللغة الروسية","الإنجليزي","الفرنسي"], answer:0 }
+    ] },
+
+  { id:"r2", level:"A1", title:"عيلتي", icon:"👨‍👩‍👧",
+    sentences:[
+      { ru:"У меня есть семья.", ar:"عندي عيلة." },
+      { ru:"Мой папа — врач.", ar:"بابا دكتور." },
+      { ru:"Моя мама — учительница.", ar:"ماما مُدرّسة." },
+      { ru:"У меня есть брат и сестра.", ar:"عندي أخ وأخت." },
+      { ru:"Брат — студент, а сестра ещё школьница.", ar:"أخويا طالب جامعي، وأختي لسه في المدرسة." },
+      { ru:"Мы живём в большом доме.", ar:"إحنا عايشين في بيت كبير." }
+    ],
+    glossary:[ { ru:"врач", ar:"دكتور" }, { ru:"учительница", ar:"مُدرّسة" }, { ru:"школьница", ar:"تلميذة" }, { ru:"ещё", ar:"لسه" } ],
+    questions:[
+      { q:"بابا بيشتغل إيه؟", options:["مُدرّس","دكتور","طالب"], answer:1 },
+      { q:"عنده كام أخ وأخت؟", options:["أخ وأخت","تلات إخوات","مفيش"], answer:0 },
+      { q:"أخته عاملة إيه؟", options:["طالبة جامعية","دكتورة","لسه في المدرسة"], answer:2 },
+      { q:"عايشين فين؟", options:["في شقة صغيرة","في بيت كبير","في فندق"], answer:1 }
+    ] },
+
+  { id:"r3", level:"A2", title:"يومي", icon:"🌅",
+    sentences:[
+      { ru:"Утром я встаю в семь часов.", ar:"الصبح بصحى الساعة سبعة." },
+      { ru:"Я пью чай и иду на работу.", ar:"بشرب شاي وبروح الشغل." },
+      { ru:"Работа начинается в девять часов.", ar:"الشغل بيبدأ الساعة تسعة." },
+      { ru:"В час я обедаю.", ar:"الساعة واحدة بتغدى." },
+      { ru:"Вечером я читаю книгу или смотрю фильм.", ar:"بالليل بقرأ كتاب أو بتفرج على فيلم." },
+      { ru:"Я ложусь спать в одиннадцать часов.", ar:"بنام الساعة حداشر." }
+    ],
+    glossary:[ { ru:"встаю", ar:"بقوم / بصحى" }, { ru:"обедаю", ar:"بتغدى" }, { ru:"ложусь спать", ar:"بروح أنام" }, { ru:"начинается", ar:"بيبدأ" } ],
+    questions:[
+      { q:"بيصحى الساعة كام؟", options:["ستة","سبعة","تسعة"], answer:1 },
+      { q:"بيشرب إيه الصبح؟", options:["قهوة","لبن","شاي"], answer:2 },
+      { q:"الشغل بيبدأ الساعة كام؟", options:["تسعة","سبعة","عشرة"], answer:0 },
+      { q:"بيعمل إيه بالليل؟", options:["بيشتغل","بيقرأ كتاب أو بيتفرج على فيلم","بيلعب كورة"], answer:1 }
+    ] },
+
+  { id:"r4", level:"A2", title:"في المحل", icon:"🛒",
+    sentences:[
+      { ru:"Вчера я пошёл в магазин.", ar:"امبارح روحت المحل." },
+      { ru:"Я купил хлеб, молоко и яблоки.", ar:"اشتريت عيش ولبن وتفاح." },
+      { ru:"Хлеб стоил сорок рублей, молоко — восемьдесят, а яблоки — сто пятьдесят.", ar:"العيش بأربعين روبل، واللبن بتمانين، والتفاح بميت وخمسين." },
+      { ru:"Всего я заплатил двести семьдесят рублей.", ar:"دفعت في المجموع ميتين وسبعين روبل." },
+      { ru:"Продавец был очень добрый.", ar:"البائع كان طيب جداً." }
+    ],
+    glossary:[ { ru:"стоил", ar:"كان سعره" }, { ru:"всего", ar:"في المجموع" }, { ru:"заплатил", ar:"دفع" }, { ru:"продавец", ar:"بائع" } ],
+    questions:[
+      { q:"اشترى إيه؟", options:["عيش ولبن وتفاح","لحمة وسمك","شاي وقهوة"], answer:0 },
+      { q:"سعر اللبن كام؟", options:["أربعين روبل","تمانين روبل","ميت وخمسين روبل"], answer:1 },
+      { q:"دفع كام في المجموع؟", options:["تلتمية روبل","ميت وخمسين روبل","ميتين وسبعين روبل"], answer:2 },
+      { q:"البائع كان عامل إزاي؟", options:["طيب جداً","زعلان","مستعجل"], answer:0 }
+    ] },
+
+  { id:"r5", level:"A2", title:"رحلة لموسكو", icon:"✈️",
+    sentences:[
+      { ru:"Летом я поеду в Москву.", ar:"في الصيف هسافر موسكو." },
+      { ru:"Я буду жить в маленькой гостинице.", ar:"هعيش في فندق صغير." },
+      { ru:"Каждый день я буду гулять по Красной площади и ходить в музеи.", ar:"كل يوم هتمشى في الميدان الأحمر وهروح المتاحف." },
+      { ru:"В Москве очень красиво.", ar:"موسكو حلوة جداً." },
+      { ru:"Я хочу попробовать русский борщ и пельмени.", ar:"عايز أجرب البورش والبلميني الروسي." }
+    ],
+    glossary:[ { ru:"поеду", ar:"هسافر (بمواصلة)" }, { ru:"гостиница", ar:"فندق" }, { ru:"гулять", ar:"يتمشى" }, { ru:"попробовать", ar:"يجرّب" } ],
+    questions:[
+      { q:"هيسافر امتى؟", options:["الشتا","الصيف","الخريف"], answer:1 },
+      { q:"هيقعد فين؟", options:["فندق صغير","شقة كبيرة","عند صاحبه"], answer:0 },
+      { q:"عايز يجرب إيه؟", options:["سوشي","كشري","بورش وبلميني"], answer:2 },
+      { q:"هيعمل إيه كل يوم؟", options:["يقعد في الفندق","يتمشى في الميدان الأحمر ويزور المتاحف","يشتغل"], answer:1 }
+    ] },
+
+  { id:"r6", level:"A2", title:"إجازة الأسبوع", icon:"⚽",
+    sentences:[
+      { ru:"В субботу мы с друзьями ходили в парк.", ar:"يوم السبت إحنا والأصحاب روحنا الحديقة." },
+      { ru:"Погода была хорошая, светило солнце.", ar:"الجو كان حلو والشمس طالعة." },
+      { ru:"Мы играли в футбол и пили лимонад.", ar:"لعبنا كورة وشربنا ليمونادة." },
+      { ru:"Потом мы пошли в кафе и ели мороженое.", ar:"بعدين رحنا كافيه وأكلنا آيس كريم." },
+      { ru:"Я был очень счастлив.", ar:"كنت سعيد جداً." }
+    ],
+    glossary:[ { ru:"светило солнце", ar:"الشمس كانت طالعة" }, { ru:"потом", ar:"بعدين" }, { ru:"мороженое", ar:"آيس كريم" }, { ru:"счастлив", ar:"سعيد" } ],
+    questions:[
+      { q:"راحوا فين يوم السبت؟", options:["السينما","الحديقة","الجامعة"], answer:1 },
+      { q:"الجو كان عامل إزاي؟", options:["مطر","برد","حلو والشمس طالعة"], answer:2 },
+      { q:"عملوا إيه في الحديقة؟", options:["سباحة","لعبوا كورة وشربوا ليمونادة","ذاكروا"], answer:1 },
+      { q:"أكلوا إيه في الكافيه؟", options:["بيتزا","آيس كريم","بورش"], answer:1 }
+    ] }
+];
+
+const DONE_KEY = "ru_arabi_reading_done";
+function loadDone(){ try { return JSON.parse(localStorage.getItem(DONE_KEY)) || {}; } catch(e){ return {}; } }
+function saveDone(d){ try { localStorage.setItem(DONE_KEY, JSON.stringify(d)); } catch(e){} }
+
+function shuffle(a){
+  a = [...a];
+  for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function show(viewId){
+  ["listView","textView","quizView","resultView"].forEach(id => document.getElementById(id).classList.remove("open"));
+  document.getElementById(viewId).classList.add("open");
+  window.scrollTo(0,0);
+}
+
+let currentId = null, current = null;
+
+/* ---- القايمة ---- */
+function renderList(){
+  const done = loadDone();
+  const body = document.getElementById("listBody");
+  const levels = [["A1","🟢 مستوى A1 — مبتدئ"],["A2","🟡 مستوى A2 — أساسي"]];
+  body.innerHTML = levels.map(([lv, label]) => {
+    const items = READING.filter(t => t.level === lv).map(t => {
+      const d = done[t.id];
+      return `
+      <div class="text-card ${d !== undefined ? "done" : ""}" onclick="openText('${t.id}')">
+        <span class="icon">${t.icon}</span>
+        <div><h3>${t.title}</h3><p>${t.sentences.length} جمل · ${t.questions.length} أسئلة</p></div>
+        ${d !== undefined ? `<span class="score">✓ ${d}/${t.questions.length}</span>` : ""}
+      </div>`;
+    }).join("");
+    return `<div class="level-title">${label}</div>${items}`;
+  }).join("");
+}
+function backToList(){ renderList(); show("listView"); }
+
+/* ---- عرض النص ---- */
+function openText(id){
+  currentId = id;
+  current = READING.find(t => t.id === id);
+  document.getElementById("tvTitle").textContent = current.icon + " " + current.title;
+  document.getElementById("tvLevel").textContent = current.level;
+  const list = document.getElementById("sentList");
+  list.classList.remove("all-show");
+  document.getElementById("toggleAllBtn").textContent = "إظهار كل الترجمة";
+  list.innerHTML = current.sentences.map((s, i) => `
+    <div class="sent" onclick="this.classList.toggle('show')">
+      <div class="sent-ru">${s.ru}</div>
+      <button class="play" onclick="event.stopPropagation(); playSentence(${i})" aria-label="استمع">🔊</button>
+      <div class="sent-ar">${s.ar}</div>
+    </div>`).join("");
+  document.getElementById("gloss").innerHTML =
+    `<h4>كلمات تفيدك في النص</h4>` +
+    current.glossary.map(g => `<div class="g"><span>${g.ar}</span><span class="r">${g.ru}</span></div>`).join("");
+  show("textView");
+}
+function playSentence(i){ ruPlayAudio(current.sentences[i].ru); }
+function toggleAll(){
+  const list = document.getElementById("sentList");
+  const on = list.classList.toggle("all-show");
+  document.getElementById("toggleAllBtn").textContent = on ? "إخفاء الترجمة" : "إظهار كل الترجمة";
+}
+
+/* ---- الأسئلة ---- */
+let qIdx = 0, correctCount = 0, qList = [];
+function startQuiz(){
+  qList = current.questions.map(q => {
+    const opts = q.options.map((text, i) => ({ text, ok: i === q.answer }));
+    return { q: q.q, opts: shuffle(opts) };
+  });
+  qIdx = 0; correctCount = 0;
+  document.getElementById("qvTitle").textContent = current.icon + " " + current.title;
+  show("quizView");
+  renderQuestion();
+}
+function renderQuestion(){
+  if (qIdx >= qList.length) return finishQuiz();
+  const item = qList[qIdx];
+  document.getElementById("qCount").textContent = "سؤال " + (qIdx+1) + " من " + qList.length;
+  document.getElementById("qBar").style.width = Math.round(qIdx/qList.length*100) + "%";
+  document.getElementById("qText").textContent = item.q;
+  document.getElementById("qNext").innerHTML = "";
+  const box = document.getElementById("qOpts");
+  box.innerHTML = "";
+  item.opts.forEach(o => {
+    const b = document.createElement("button");
+    b.className = "opt"; b.textContent = o.text;
+    b.onclick = () => choose(o, b);
+    box.appendChild(b);
+  });
+}
+function choose(o, btn){
+  const all = document.querySelectorAll("#qOpts .opt");
+  all.forEach(b => b.disabled = true);
+  if (o.ok) { btn.classList.add("correct"); correctCount++; }
+  else {
+    btn.classList.add("wrong");
+    const item = qList[qIdx];
+    all.forEach((b, i) => { if (item.opts[i].ok) b.classList.add("correct"); });
+  }
+  const last = qIdx + 1 >= qList.length;
+  document.getElementById("qNext").innerHTML =
+    `<button class="cta" onclick="nextQ()">${last ? "شوف النتيجة" : "التالي ←"}</button>`;
+}
+function nextQ(){ qIdx++; renderQuestion(); }
+
+function finishQuiz(){
+  const total = qList.length;
+  const done = loadDone();
+  const first = done[currentId] === undefined;
+  let xp = 0;
+  if (first) {
+    xp = correctCount * 5 + (correctCount === total ? 10 : 0);
+    RuProgress.addXp(xp, "reading_" + currentId);
+    ruRenderStatsBar("statsBar");
+  }
+  if (done[currentId] === undefined || correctCount > done[currentId]) done[currentId] = correctCount;
+  saveDone(done);
+  if (READING.every(t => done[t.id] !== undefined)) RuProgress.markSectionComplete("reading");
+
+  const emoji = correctCount === total ? "🏆" : correctCount >= total - 1 ? "🎉" : correctCount >= 1 ? "👍" : "💪";
+  const nextText = READING[READING.findIndex(t => t.id === currentId) + 1];
+  document.getElementById("resultBox").innerHTML = `
+    <div class="big">${emoji}</div>
+    <div class="num">${correctCount} / ${total}</div>
+    <p>${first ? "كسبت " + xp + " XP" + (correctCount === total ? " (مع مكافأة الإجابات الكاملة 🌟)" : "") : "ده نص اتحلّ قبل كده — المراجعة مفيدة بس من غير XP جديد"}</p>
+    <div class="result-actions">
+      <button class="btn-ghost" onclick="openText('${currentId}')">اقرأ النص تاني</button>
+      ${nextText ? `<button class="cta" onclick="openText('${nextText.id}')">النص الجاي ←</button>` : ""}
+      <button class="btn-ghost" onclick="backToList()">كل النصوص</button>
+    </div>`;
+  show("resultView");
+}
+
+renderList();
+</script>
+</body>
+</html>

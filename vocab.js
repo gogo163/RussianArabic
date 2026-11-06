@@ -105,6 +105,85 @@ const VOCAB_CATEGORIES = [
       { id:"daleko",  ru:"далеко",  tr:"dalekó",  ar:"بعيد" }
     ]
   }
+  ,
+  {
+    id:"a2_routine", title:"الروتين اليومي", icon:"🌅", level:"A2",
+    words:[
+      { id:"utro",      ru:"утро",      tr:"ýtro",      ar:"صباح" },
+      { id:"vecher",    ru:"вечер",     tr:"vécher",    ar:"مساء" },
+      { id:"vstavat",   ru:"вставать",  tr:"vstavát'",  ar:"يقوم من النوم" },
+      { id:"zavtrakat", ru:"завтракать",tr:"závtrakat'",ar:"يفطر" },
+      { id:"obedat",    ru:"обедать",   tr:"obédat'",   ar:"يتغدى" },
+      { id:"uzhinat",   ru:"ужинать",   tr:"úzhinat'",  ar:"يتعشى" },
+      { id:"rabotat",   ru:"работать",  tr:"rabótat'",  ar:"يشتغل" },
+      { id:"spat",      ru:"спать",     tr:"spat'",     ar:"ينام" }
+    ]
+  },
+  {
+    id:"a2_city", title:"المدينة", icon:"🏙️", level:"A2",
+    words:[
+      { id:"ulitsa",     ru:"улица",     tr:"úlitsa",     ar:"شارع" },
+      { id:"magazin",    ru:"магазин",   tr:"magazín",    ar:"محل" },
+      { id:"bank",       ru:"банк",      tr:"bank",       ar:"بنك" },
+      { id:"bolnitsa",   ru:"больница",  tr:"bol'nítsa",  ar:"مستشفى" },
+      { id:"apteka",     ru:"аптека",    tr:"aptéka",     ar:"صيدلية" },
+      { id:"ostanovka",  ru:"остановка", tr:"ostanóvka",  ar:"موقف مواصلات" },
+      { id:"avtobus",    ru:"автобус",   tr:"avtóbus",    ar:"أتوبيس" },
+      { id:"ploshchad",  ru:"площадь",   tr:"plóshchad'", ar:"ميدان" }
+    ]
+  },
+  {
+    id:"a2_food", title:"أكل ومطبخ", icon:"🍲", level:"A2",
+    words:[
+      { id:"sup",      ru:"суп",      tr:"sup",      ar:"شوربة" },
+      { id:"borshch",  ru:"борщ",     tr:"borshch",  ar:"بورش (شوربة الشمندر)" },
+      { id:"pelmeni",  ru:"пельмени", tr:"pel'méni", ar:"بلميني (عجينة محشية)" },
+      { id:"moloko",   ru:"молоко",   tr:"molokó",   ar:"لبن" },
+      { id:"yabloko",  ru:"яблоко",   tr:"yábloko",  ar:"تفاحة" },
+      { id:"syr",      ru:"сыр",      tr:"syr",      ar:"جبنة" },
+      { id:"ryba",     ru:"рыба",     tr:"rýba",     ar:"سمك" },
+      { id:"sakhar",   ru:"сахар",    tr:"sákhar",   ar:"سكر" }
+    ]
+  },
+  {
+    id:"a2_weather", title:"الطقس والفصول", icon:"☀️", level:"A2",
+    words:[
+      { id:"kholodno", ru:"холодно", tr:"khólodno", ar:"برد" },
+      { id:"zharko",   ru:"жарко",   tr:"zhárko",   ar:"حر" },
+      { id:"teplo",    ru:"тепло",   tr:"teplo",    ar:"دافي" },
+      { id:"dozhd",    ru:"дождь",   tr:"dozhd'",   ar:"مطر" },
+      { id:"sneg",     ru:"снег",    tr:"sneg",     ar:"تلج" },
+      { id:"veter",    ru:"ветер",   tr:"vétyer",   ar:"هوا / ريح" },
+      { id:"osen",     ru:"осень",   tr:"ósen'",    ar:"الخريف" },
+      { id:"vesna",    ru:"весна",   tr:"vesná",    ar:"الربيع" }
+    ]
+  },
+  {
+    id:"a2_adj", title:"صفات وأحاسيس", icon:"😊", level:"A2",
+    words:[
+      { id:"bolshoy",    ru:"большой",    tr:"bol'shóy",    ar:"كبير" },
+      { id:"malenky",    ru:"маленький",  tr:"málen'kiy",   ar:"صغير" },
+      { id:"krasivy",    ru:"красивый",   tr:"krasívyy",    ar:"جميل" },
+      { id:"novy",       ru:"новый",      tr:"nóvyy",       ar:"جديد" },
+      { id:"stary",      ru:"старый",     tr:"stáryy",      ar:"قديم / كبير في السن" },
+      { id:"dobry",      ru:"добрый",     tr:"dóbryy",      ar:"طيب" },
+      { id:"schastlivy", ru:"счастливый", tr:"schastlívyy", ar:"سعيد" },
+      { id:"ustaly",     ru:"усталый",    tr:"ustályy",     ar:"تعبان" }
+    ]
+  },
+  {
+    id:"a2_verbs", title:"أفعال شائعة", icon:"🏃", level:"A2",
+    words:[
+      { id:"idti",     ru:"идти",     tr:"idtí",     ar:"يمشي" },
+      { id:"ekhat",    ru:"ехать",    tr:"yékhat'",  ar:"يسافر / يروح بمواصلة" },
+      { id:"pokupat",  ru:"покупать", tr:"pokupát'", ar:"يشتري" },
+      { id:"zhit",     ru:"жить",     tr:"zhit'",    ar:"يعيش / يسكن" },
+      { id:"lyubit",   ru:"любить",   tr:"lyubít'",  ar:"يحب" },
+      { id:"znat",     ru:"знать",    tr:"znat'",    ar:"يعرف" },
+      { id:"khotet",   ru:"хотеть",   tr:"khotét'",  ar:"يريد" },
+      { id:"pisat",    ru:"писать",   tr:"pisát'",   ar:"يكتب" }
+    ]
+  }
 ];
 
 function ruAllVocabWords(){

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>قواعد A2 — تعلم الروسية بالعربي</title>
+<script>
+  (function(){
+    var t = localStorage.getItem("ru_arabi_theme");
+    if (t === "dark") document.documentElement.setAttribute("data-theme", "dark");
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .page-head{ padding:28px 0 8px; text-align:center; }
+  .page-head h1{ font-size:2rem; color:var(--gold-soft); margin-bottom:8px; }
+  .page-head p{ color:var(--text-dim2); font-size:.95rem; }
+  .lvl{ display:inline-block; font-size:.72rem; color:var(--ice); border:1px solid var(--border); border-radius:10px; padding:2px 10px; margin-top:6px; }
+
+  details.sec{
+    margin-top:14px; background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; overflow:hidden;
+  }
+  details.sec summary{
+    list-style:none; cursor:pointer; padding:16px 18px; display:flex; align-items:center; gap:12px;
+    font-size:1.05rem; font-weight:800; color:var(--text);
+  }
+  details.sec summary::-webkit-details-marker{ display:none; }
+  details.sec summary .ic{ font-size:1.4rem; }
+  details.sec summary .chev{ margin-right:auto; color:var(--gold-soft); transition:transform .2s ease; }
+  details.sec[open] summary .chev{ transform:rotate(90deg); }
+  .sec-body{ padding:0 18px 18px; }
+  .intro{ font-size:.9rem; color:var(--text-dim); margin-bottom:14px; }
+
+  .tbl{ background:var(--surface3); border-radius:8px; padding:12px 14px; margin-bottom:14px; }
+  .tbl h3{ font-family:'Aref Ruqaa', serif; font-size:1.15rem; color:var(--text); direction:ltr; text-align:right; margin-bottom:2px; }
+  .tbl .meaning{ font-size:.76rem; color:var(--text-dim4); margin-bottom:8px; }
+  .conj-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:7px 0; border-bottom:1px solid var(--border); font-size:.9rem; }
+  .conj-row:last-child{ border-bottom:none; }
+  .conj-row .p{ color:var(--text-dim3); min-width:86px; }
+  .conj-row .f{ font-family:'Aref Ruqaa', serif; font-size:1.1rem; color:var(--text); flex:1; text-align:center; direction:ltr; }
+  .play{
+    width:32px; height:32px; border-radius:50%; flex:none;
+    background:var(--surface2); border:1px solid var(--border); color:var(--text); cursor:pointer; font-size:.85rem;
+  }
+  .plays{ display:flex; gap:6px; }
+
+  .ex{ display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px dashed var(--border); }
+  .ex:last-child{ border-bottom:none; }
+  .ex .txt{ flex:1; }
+  .ex .ru{ font-family:'Aref Ruqaa', serif; font-size:1.15rem; color:var(--text); direction:ltr; text-align:left; }
+  .ex .ar{ font-size:.82rem; color:var(--text-dim3); margin-top:2px; }
+  .ex-title{ font-size:.82rem; color:var(--gold-soft); font-weight:800; margin:6px 0 4px; }
+
+  .tip{ margin-top:12px; background:rgba(212,169,79,.1); border-right:3px solid var(--gold); border-radius:6px; padding:10px 14px; font-size:.86rem; color:var(--text-dim); }
+
+  .finish-box{ text-align:center; padding:30px 0 24px; }
+  .finish-box p{ font-size:.88rem; color:var(--text-dim3); margin-bottom:14px; }
+  .toast{
+    position:fixed; bottom:96px; left:50%; transform:translateX(-50%);
+    background:var(--gold); color:var(--on-accent); font-weight:800;
+    padding:10px 22px; border-radius:20px; font-size:.9rem;
+    opacity:0; pointer-events:none; transition:opacity .25s ease; z-index:10;
+  }
+  .toast.show{ opacity:1; }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+
+<div class="app-header">
+  <a class="icon-circle" href="index.html" aria-label="الرئيسية">←</a>
+  <div class="stats" id="statsBar"></div>
+  <button class="theme-toggle" id="themeToggleBtn" onclick="ruToggleTheme()" aria-label="تبديل الوضع الليلي">🌙</button>
+</div>
+
+<div class="wrap has-bottom-nav">
+  <div class="page-head">
+    <h1>قواعد A2 🎓</h1>
+    <p>الخطوة اللي بعد الأساسيات — دوس على أي موضوع يفتح</p>
+    <span class="lvl">مستوى A2</span>
+  </div>
+
+  <div id="sections"></div>
+
+  <div class="finish-box">
+    <p>راجع كل المواضيع بالترتيب، وسمّع الأمثلة أكتر من مرة</p>
+    <button class="cta" onclick="finishA2()">خلصت قواعد A2 ⭐</button>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <a href="index.html"><span class="tab-icon">🏠</span><span>الرئيسية</span></a>
+  <a href="letters.html"><span class="tab-icon">🔤</span><span>الحروف</span></a>
+  <a href="vocabulary.html"><span class="tab-icon">📚</span><span>المفردات</span></a>
+  <a class="disabled" href="#"><span class="tab-icon">🏅</span><span>إنجازاتي</span><span class="dot"></span></a>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script src="progress.js"></script>
+<script src="theme.js"></script>
+<script src="audio.js"></script>
+<script>
+ruRenderStatsBar("statsBar");
+
+/* ===================== مواضيع A2 ===================== */
+const A2_SECTIONS = [
+  { id:"motion", icon:"🚶", title:"أفعال الحركة",
+    intro:"الروسي بيفرّق بين المشي والركوب، وبين رحلة واحدة حاصلة دلوقتي ورحلة متكررة. ده من أهم الفروق في A2.",
+    tables:[
+      { title:"идти", meaning:"يمشي — رحلة واحدة دلوقتي", rows:[
+        { p:"я", f:"иду", raw:"я иду" }, { p:"ты", f:"идёшь", raw:"ты идёшь" }, { p:"он/она", f:"идёт", raw:"он идёт" },
+        { p:"мы", f:"идём", raw:"мы идём" }, { p:"вы", f:"идёте", raw:"вы идёте" }, { p:"они", f:"идут", raw:"они идут" } ] },
+      { title:"ходить", meaning:"يمشي — عادة أو رايح جاي", rows:[
+        { p:"я", f:"хожу", raw:"я хожу" }, { p:"ты", f:"ходишь", raw:"ты ходишь" }, { p:"он/она", f:"ходит", raw:"он ходит" },
+        { p:"мы", f:"ходим", raw:"мы ходим" }, { p:"вы", f:"ходите", raw:"вы ходите" }, { p:"они", f:"ходят", raw:"они ходят" } ] },
+      { title:"ехать", meaning:"يسافر / يروح بمواصلة — رحلة واحدة دلوقتي", rows:[
+        { p:"я", f:"еду", raw:"я еду" }, { p:"ты", f:"едешь", raw:"ты едешь" }, { p:"он/она", f:"едет", raw:"он едет" },
+        { p:"мы", f:"едем", raw:"мы едем" }, { p:"вы", f:"едете", raw:"вы едете" }, { p:"они", f:"едут", raw:"они едут" } ] },
+      { title:"ездить", meaning:"يسافر / يروح بمواصلة — عادة أو رايح جاي", rows:[
+        { p:"я", f:"езжу", raw:"я езжу" }, { p:"ты", f:"ездишь", raw:"ты ездишь" }, { p:"он/она", f:"ездит", raw:"он ездит" },
+        { p:"мы", f:"ездим", raw:"мы ездим" }, { p:"вы", f:"ездите", raw:"вы ездите" }, { p:"они", f:"ездят", raw:"они ездят" } ] }
+    ],
+    examples:[
+      { ru:"Я иду в университет.", ar:"أنا رايح الجامعة (دلوقتي، ماشي)." },
+      { ru:"Я хожу в университет каждый день.", ar:"بروح الجامعة كل يوم." },
+      { ru:"Мы едем в Москву.", ar:"إحنا مسافرين موسكو (دلوقتي)." },
+      { ru:"Он ездит на работу на метро.", ar:"هو بيروح الشغل بالمترو (كل يوم)." }
+    ],
+    tip:"идти / ехать = رحلة واحدة في اتجاه واحد وحاصلة دلوقتي. ходить / ездить = عادة، أو رايح جاي. وكمان: идти وходить لو ماشي على رجلك، ехать وездить لو راكب." },
+
+  { id:"aspect", icon:"🔁", title:"التام وغير التام",
+    intro:"أغلب الأفعال الروسية ليها شكلين: غير تام (بيوصف العملية أو التكرار)، وتام (بيوصف نتيجة اتحققت وخلصت).",
+    tables:[
+      { title:"أزواج مهمة", meaning:"الأول غير تام، التاني تام", rows:[
+        { p:"يعمل",   f:"делать / сделать",     raw:"делать",     raw2:"сделать" },
+        { p:"يقرأ",   f:"читать / прочитать",   raw:"читать",     raw2:"прочитать" },
+        { p:"يكتب",   f:"писать / написать",    raw:"писать",     raw2:"написать" },
+        { p:"يشتري",  f:"покупать / купить",    raw:"покупать",   raw2:"купить" },
+        { p:"يقول",   f:"говорить / сказать",   raw:"говорить",   raw2:"сказать" } ] }
+    ],
+    examples:[
+      { ru:"Вчера я читал книгу весь вечер.", ar:"امبارح كنت بقرأ في الكتاب طول الليل (العملية)." },
+      { ru:"Вчера я прочитал книгу.", ar:"امبارح خلّصت قراءة الكتاب (النتيجة)." },
+      { ru:"Я каждый день покупаю хлеб.", ar:"بشتري عيش كل يوم (تكرار)." },
+      { ru:"Вчера я купил хлеб.", ar:"امبارح اشتريت عيش (مرة وخلصت)." },
+      { ru:"Я долго писал письмо.", ar:"قعدت أكتب الجواب وقت طويل (عملية)." },
+      { ru:"Я написал письмо.", ar:"كتبت الجواب وخلصته (نتيجة)." },
+      { ru:"Я буду читать книгу.", ar:"هقرأ الكتاب (هقعد أقرأ فيه)." },
+      { ru:"Я прочитаю книгу.", ar:"هخلّص قراءة الكتاب." }
+    ],
+    tip:"سؤال بسيط يساعدك تختار: عايز تقول إنك 'كنت بتعمل' ولا إنك 'خلّصت'؟ لو بتعمل → غير تام، لو خلّصت → تام." },
+
+  { id:"accusative", icon:"🎯", title:"المفعولية بالتفصيل",
+    intro:"المفعول المباشر (اللي الفعل بيقع عليه) بيتغيّر آخره حسب نوعه. القاعدة الأساسية: المؤنث بيتغيّر، والمذكر الجماد والمحايد زي ما هم، والمذكر الحي (إنسان أو حيوان) بياخد شكل الإضافية.",
+    tables:[
+      { title:"إزاي بتتغيّر؟", meaning:"الاسم ← في المفعولية", rows:[
+        { p:"مؤنث -а ← -у",    f:"мама → маму",      raw:"маму" },
+        { p:"مؤنث -я ← -ю",    f:"Россия → Россию",  raw:"Россию" },
+        { p:"مذكر جماد",        f:"стол → стол",      raw:"стол" },
+        { p:"مذكر حي",          f:"брат → брата",     raw:"брата" },
+        { p:"محايد",            f:"окно → окно",      raw:"окно" } ] }
+    ],
+    examples:[
+      { ru:"Я читаю книгу.", ar:"بقرأ كتاب." },
+      { ru:"Я вижу стол.", ar:"شايف الترابيزة." },
+      { ru:"Я вижу брата.", ar:"شايف أخويا." },
+      { ru:"Я люблю маму.", ar:"بحب ماما." },
+      { ru:"Я знаю Ахмеда.", ar:"أعرف أحمد." },
+      { ru:"Я открываю окно.", ar:"بفتح الشباك." }
+    ],
+    tip:"اللي بيغلّط الناس: 'я вижу брата' مش 'я вижу брат'. الحي المذكر هو الوحيد اللي بيتغيّر من المذكر." },
+
+  { id:"where", icon:"📍", title:"فين؟ ورايح فين؟",
+    intro:"الروسي بيفرّق بين المكان الثابت (فين؟ → الوصفية) والحركة ناحية مكان (رايح فين؟ → المفعولية). نفس الحرف (в أو на)، بس الاسم بيتغيّر.",
+    tables:[],
+    examples:[
+      { ru:"Я в школе.", ar:"أنا في المدرسة. (ثابت)" },
+      { ru:"Я иду в школу.", ar:"أنا رايح المدرسة. (حركة)" },
+      { ru:"Я живу в Москве.", ar:"أنا ساكن في موسكو." },
+      { ru:"Я еду в Москву.", ar:"أنا مسافر موسكو." },
+      { ru:"Он на работе.", ar:"هو في الشغل." },
+      { ru:"Он идёт на работу.", ar:"هو رايح الشغل." },
+      { ru:"Я иду к врачу.", ar:"أنا رايح للدكتور. (к + الجرّية)" },
+      { ru:"Я из Египта.", ar:"أنا من مصر. (из + الإضافية)" },
+      { ru:"Это подарок от друга.", ar:"دي هدية من صاحبي. (от + الإضافية)" },
+      { ru:"Я пью чай с другом.", ar:"بشرب شاي مع صاحبي. (с + الآلية)" }
+    ],
+    tip:"в = جوه مكان مقفول (школа، город). на = على أو في مكان مفتوح أو نشاط (работа، площадь، улица). بنقول 'на работе' مش 'в работе'." },
+
+  { id:"negnum", icon:"🔢", title:"النفي والأعداد",
+    intro:"نفي الوجود بـ 'нет' بتتبعه الحالة الإضافية. والأعداد بتغيّر شكل الاسم اللي بعدها.",
+    tables:[
+      { title:"العدد + الاسم", meaning:"مذكر: стол — مؤنث: книга", rows:[
+        { p:"١",       f:"один стол",   raw:"один стол" },
+        { p:"٢ لـ ٤",  f:"два стола",   raw:"два стола" },
+        { p:"٥ وفوق",  f:"пять столов", raw:"пять столов" },
+        { p:"١ مؤنث",  f:"одна книга",  raw:"одна книга" },
+        { p:"٢ لـ ٤",  f:"две книги",   raw:"две книги" },
+        { p:"٥ وفوق",  f:"пять книг",   raw:"пять книг" } ] }
+    ],
+    examples:[
+      { ru:"У меня нет времени.", ar:"معنديش وقت." },
+      { ru:"У меня нет брата.", ar:"معنديش أخ." },
+      { ru:"В городе нет метро.", ar:"مفيش مترو في المدينة." },
+      { ru:"У меня один брат.", ar:"عندي أخ واحد." },
+      { ru:"У меня два брата.", ar:"عندي أخين." },
+      { ru:"У меня пять братьев.", ar:"عندي خمسة إخوة." }
+    ],
+    tip:"٢-٤ بعدهم مفرد بشكل الإضافية (два стола)، و٥ وفوق بعدهم جمع بشكل الإضافية (пять столов)." }
+];
+
+/* ===================== العرض ===================== */
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function playBtn(t, label){ return `<button class="play" data-t="${esc(t)}" aria-label="استمع">${label || "🔊"}</button>`; }
+
+function rowHtml(r){
+  const plays = playBtn(r.raw) + (r.raw2 ? playBtn(r.raw2, "🔊²") : "");
+  return `<div class="conj-row"><span class="p">${r.p}</span><span class="f">${r.f}</span><span class="plays">${plays}</span></div>`;
+}
+function tableHtml(t){
+  return `<div class="tbl"><h3>${t.title}</h3><div class="meaning">${t.meaning}</div>${t.rows.map(rowHtml).join("")}</div>`;
+}
+function exampleHtml(e){
+  return `<div class="ex"><div class="txt"><div class="ru">${e.ru}</div><div class="ar">${e.ar}</div></div>${playBtn(e.ru)}</div>`;
+}
+
+document.getElementById("sections").innerHTML = A2_SECTIONS.map((s, i) => `
+  <details class="sec" ${i === 0 ? "open" : ""}>
+    <summary><span class="ic">${s.icon}</span><span>${s.title}</span><span class="chev">‹</span></summary>
+    <div class="sec-body">
+      <div class="intro">${s.intro}</div>
+      ${s.tables.map(tableHtml).join("")}
+      <div class="ex-title">أمثلة</div>
+      ${s.examples.map(exampleHtml).join("")}
+      <div class="tip">💡 ${s.tip}</div>
+    </div>
+  </details>`).join("");
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-t]");
+  if (b) ruPlayAudio(b.dataset.t);
+});
+
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2200);
+}
+function finishA2(){
+  const already = RuProgress.getState().sections.grammarA2;
+  RuProgress.markSectionComplete("grammarA2");
+  if (!already) {
+    RuProgress.addXp(25, "section_grammar_a2");
+    ruRenderStatsBar("statsBar");
+    showToast("+25 XP — خلصت قواعد A2 🎉");
+  } else {
+    showToast("القسم ده خلصته بالفعل ✓");
+  }
+}
+</script>
+</body>
+</html>

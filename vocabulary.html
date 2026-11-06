@@ -174,7 +174,7 @@ function renderCategories(){
     const learnedInCat = cat.words.filter(w => state.vocab[w.id] && state.vocab[w.id].repetition > 0).length;
     const card = document.createElement("div");
     card.className = "cat-card" + (activeCat === cat.id ? " active" : "");
-    card.innerHTML = `<span class="icon">${cat.icon}</span><h3>${cat.title}</h3><span class="cnt">${learnedInCat} / ${cat.words.length} اتراجعت</span>`;
+    card.innerHTML = `<span class="icon">${cat.icon}</span><h3>${cat.title}</h3><span class="cnt">${cat.level ? cat.level + " · " : ""}${learnedInCat} / ${cat.words.length} اتراجعت</span>`;
     card.onclick = () => { activeCat = cat.id; renderCategories(); renderWords(); };
     grid.appendChild(card);
   });

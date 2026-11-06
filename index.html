@@ -241,6 +241,20 @@
         <div class="side text"><h3>ترجمة للروسية</h3><p id="translateNodeDesc">ترجم الجملة بنفسك — المستوى الاحترافي</p></div>
       </div>
     </a>
+
+    <a class="node-link" href="reading.html">
+      <div class="node" id="readingNode">
+        <div class="side marker">📰</div>
+        <div class="side text"><h3>تمارين القراءة</h3><p id="readingNodeDesc">٦ نصوص A1 و A2 بالصوت والأسئلة</p></div>
+      </div>
+    </a>
+
+    <a class="node-link" href="grammar-a2.html">
+      <div class="node" id="a2Node">
+        <div class="side marker">🎓</div>
+        <div class="side text"><h3>قواعد A2</h3><p id="a2NodeDesc">أفعال الحركة، التام وغير التام، والمزيد</p></div>
+      </div>
+    </a>
   </div>
 </div>
 
@@ -334,6 +348,18 @@
   document.getElementById("translateNode").classList.add(s.sections && s.sections.translate ? "done" : "active");
   if (s.sections && s.sections.translate) {
     document.getElementById("translateNodeDesc").textContent = "جربتها ✓ — العب تاني";
+  }
+
+  document.getElementById("a2Node").classList.add(s.sections && s.sections.grammarA2 ? "done" : "active");
+  if (s.sections && s.sections.grammarA2) {
+    document.getElementById("a2NodeDesc").textContent = "خلصتها ✓ — تقدر تراجعها";
+  }
+
+  let readingDone = 0;
+  try { readingDone = Object.keys(JSON.parse(localStorage.getItem("ru_arabi_reading_done")) || {}).length; } catch(e) {}
+  document.getElementById("readingNode").classList.add(readingDone >= 6 ? "done" : "active");
+  if (readingDone > 0) {
+    document.getElementById("readingNodeDesc").textContent = readingDone + " / 6 نصوص اتحلّت";
   }
 
   if (learnedCount > 0 && learnedCount < 33) {
