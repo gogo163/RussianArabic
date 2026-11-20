@@ -74,6 +74,36 @@
   .result-box .score-num{ font-family:'Aref Ruqaa', serif; font-size:2rem; color:var(--gold-soft); margin-bottom:6px; }
   .result-box p{ font-size:.9rem; color:var(--text-dim2); margin-bottom:20px; }
   .result-actions{ display:flex; gap:10px; justify-content:center; }
+
+  /* ---- المستوى الصعب + الكيبورد الروسي ---- */
+  .mode-row{ display:flex; gap:10px; margin-top:14px; }
+  .mode-btn{
+    flex:1; padding:14px 8px; border-radius:12px; border:1px solid var(--border);
+    background:var(--surface2); color:var(--text); font-family:'Tajawal',sans-serif;
+    font-size:.92rem; font-weight:800; cursor:pointer; line-height:1.5;
+  }
+  .mode-btn small{ display:block; font-weight:400; font-size:.72rem; color:var(--text-dim3); }
+  .mode-btn.easy{ border-color:var(--green); }
+  .mode-btn.hard{ border-color:var(--brick); }
+  .h-input{
+    width:100%; padding:14px 16px; font-family:'Aref Ruqaa', serif; font-size:1.3rem;
+    background:var(--surface3); border:1px solid var(--border); border-radius:10px;
+    color:var(--text); direction:ltr; text-align:left; margin-bottom:6px;
+  }
+  .h-hint{ font-size:.85rem; color:var(--gold-soft); min-height:1.3em; margin-bottom:6px; }
+  .h-note{ font-size:.72rem; color:var(--text-dim4); margin-bottom:10px; text-align:center; }
+  .kb{ direction:ltr; margin-bottom:14px; user-select:none; }
+  .kb-row{ display:flex; gap:4px; justify-content:center; margin-bottom:5px; }
+  .kb-key{
+    flex:1; min-width:0; padding:11px 0; touch-action:manipulation;
+    font-family:'Aref Ruqaa', serif; font-size:1.1rem; color:var(--text);
+    background:var(--surface2); border:1px solid var(--border); border-radius:6px; cursor:pointer;
+  }
+  .kb-key:active{ background:var(--gold); color:var(--on-accent); }
+  .kb-wide{ flex:1.6; font-family:'Tajawal',sans-serif; font-size:.85rem; }
+  .kb-space{ flex:4; font-family:'Tajawal',sans-serif; font-size:.85rem; }
+  .verdict.close{ color:var(--gold-soft); }
+  .your{ font-size:.85rem; color:var(--text-dim3); margin:4px 0; direction:ltr; }
 </style>
 </head>
 <body>
@@ -94,9 +124,12 @@
   <div class="start-card" id="startCard">
     <div class="big">🔤➡️🇷🇺</div>
     <p>١٠ جمل عشوائية، من البسيط للأصعب</p>
-    <p>فيه كلمات زيادة مش من الجملة، لازم تختار صح!</p>
+    <p>السهل بتختار فيه الكلمات، والصعب لازم تكتب الجملة كلها من دماغك.</p>
     <div class="best" id="bestLine"></div>
-    <button class="cta" onclick="startRound()">ابدأ</button>
+    <div class="mode-row">
+      <button class="mode-btn easy" onclick="startRound()">🟢 سهل<small>رتّب الكلمات (فيه كلمات زيادة)</small></button>
+      <button class="mode-btn hard" onclick="startHard()">🔴 صعب<small>اكتب بنفسك بكيبورد روسي</small></button>
+    </div>
   </div>
 
   <div class="tr-view" id="trView">
@@ -156,8 +189,11 @@ function shuffle(a){
 const BEST_KEY = "ru_arabi_games_best";
 function loadBest(){ try{ return JSON.parse(localStorage.getItem(BEST_KEY))||{}; }catch(e){ return {}; } }
 function renderBest(){
-  const b = loadBest().tr || 0;
-  document.getElementById("bestLine").textContent = b ? ("أفضل نتيجة: " + b) : "";
+  const b = loadBest();
+  const parts = [];
+  if (b.tr) parts.push("سهل: " + b.tr);
+  if (b.trHard) parts.push("صعب: " + b.trHard);
+  document.getElementById("bestLine").textContent = parts.length ? ("أفضل نتيجة — " + parts.join(" · ")) : "";
 }
 renderBest();
 
@@ -290,6 +326,180 @@ function finishRound(){
       </div>
     </div>`;
 }
+
+/* =====================================================================
+   المستوى الصعب: اكتب الترجمة بنفسك بكيبورد روسي جوه الصفحة
+   ===================================================================== */
+const HARD_BANK = [
+  { ar:"أنا بدرس اللغة الروسية في الجامعة", ru:"Я изучаю русский язык в университете", end:"." },
+  { ar:"هسافر موسكو الصيف الجاي",           ru:"Летом я поеду в Москву", alts:["Я поеду в Москву летом"], end:"." },
+  { ar:"امبارح اشتريت عيش ولبن",            ru:"Вчера я купил хлеб и молоко", alts:["Я вчера купил хлеб и молоко","Я купил вчера хлеб и молоко"], end:"." },
+  { ar:"عندي أخ واحد وأختين",               ru:"У меня один брат и две сестры", end:"." },
+  { ar:"فين أقرب صيدلية؟",                  ru:"Где ближайшая аптека", end:"?" },
+  { ar:"ممكن أدفع بالكارت؟",                ru:"Можно оплатить картой", end:"?" },
+  { ar:"هو بيشتغل في مستشفى كبيرة",         ru:"Он работает в большой больнице", end:"." },
+  { ar:"إحنا بنروح الجامعة كل يوم",         ru:"Мы ходим в университет каждый день", alts:["Каждый день мы ходим в университет"], end:"." },
+  { ar:"معنديش وقت النهارده",               ru:"У меня нет времени сегодня", alts:["Сегодня у меня нет времени"], end:"." },
+  { ar:"أنا بحب أقرأ كتب بالروسي",          ru:"Я люблю читать книги по-русски", end:"." },
+  { ar:"هنروح المطعم بعد الشغل",            ru:"После работы мы пойдём в ресторан", alts:["Мы пойдём в ресторан после работы"], end:"." },
+  { ar:"دي هدية من صاحبي",                  ru:"Это подарок от друга", end:"." },
+  { ar:"كنت بكتب جواب طول المسا",           ru:"Я писал письмо весь вечер", end:"." },
+  { ar:"أنا مش عارف فين المترو",            ru:"Я не знаю, где метро", end:"." },
+  { ar:"عايز أتكلم روسي كويس",              ru:"Я хочу хорошо говорить по-русски", end:"." },
+  { ar:"اسمي أحمد وأنا من مصر",             ru:"Меня зовут Ахмед, и я из Египта", alts:["Меня зовут Ахмед я из Египта"], end:"." },
+  { ar:"عندي تذكرة لموسكو",                 ru:"У меня есть билет в Москву", end:"." },
+  { ar:"البنت دي جميلة جداً",               ru:"Эта девушка очень красивая", end:"." }
+];
+
+const KB_ROWS = [
+  ["й","ц","у","к","е","н","г","ш","щ","з","х","ъ"],
+  ["ф","ы","в","а","п","р","о","л","д","ж","э"],
+  ["я","ч","с","м","и","т","ь","б","ю","ё"]
+];
+
+function normHard(s){
+  return String(s).toLowerCase()
+    .replace(/ё/g, "е")
+    .replace(/[-—–]/g, " ")
+    .replace(/[.,!?;:«»"'()]/g, " ")
+    .replace(/\s+/g, " ").trim();
+}
+function levHard(a, b){
+  const m = a.length, n = b.length;
+  const dp = Array.from({length:m+1}, (_, i) => [i, ...new Array(n).fill(0)]);
+  for (let j = 1; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++)
+    for (let j = 1; j <= n; j++)
+      dp[i][j] = a[i-1] === b[j-1] ? dp[i-1][j-1] : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+  return dp[m][n];
+}
+/* ok = صح بالظبط، close = غلطة حرف أو اتنين، bad = غلط */
+function gradeHard(input, q){
+  const ni = normHard(input);
+  if (!ni) return "empty";
+  const targets = [q.ru, ...(q.alts || [])].map(normHard);
+  if (targets.includes(ni)) return "ok";
+  const best = Math.min(...targets.map(t => levHard(ni, t)));
+  const limit = targets[0].length < 12 ? 1 : 2;
+  return best <= limit ? "close" : "bad";
+}
+
+let hRound = [], hIdx = 0, hScore = 0, hCurrent = null, hHint = false, hDone = false, hCorrect = 0;
+
+function startHard(){
+  hRound = shuffle(HARD_BANK).slice(0, 10);
+  hIdx = 0; hScore = 0; hCorrect = 0;
+  document.getElementById("trScore").textContent = 0;
+  document.getElementById("startCard").style.display = "none";
+  document.getElementById("trView").classList.add("open");
+  nextHard();
+}
+
+function nextHard(){
+  if (hIdx >= hRound.length) { finishHard(); return; }
+  hCurrent = hRound[hIdx]; hHint = false; hDone = false;
+  document.getElementById("trCount").textContent = (hIdx+1) + "/" + hRound.length;
+  document.getElementById("trBar").style.width = Math.round(hIdx/hRound.length*100) + "%";
+
+  const kbHtml = KB_ROWS.map(row =>
+    `<div class="kb-row">${row.map(k => `<button class="kb-key" data-k="${k}">${k}</button>`).join("")}</div>`
+  ).join("") + `
+    <div class="kb-row">
+      <button class="kb-key kb-wide" data-act="back">⌫</button>
+      <button class="kb-key kb-space" data-act="space">مسافة</button>
+      <button class="kb-key kb-wide" data-act="clear">مسح</button>
+    </div>`;
+
+  document.getElementById("trBody").innerHTML = `
+    <div class="tr-level">🔴 صعب — اكتب بنفسك</div>
+    <div class="tr-prompt-label">ترجم للروسي:</div>
+    <div class="tr-prompt">${hCurrent.ar}</div>
+    <div class="h-hint" id="hHint"></div>
+    <input id="hInput" class="h-input" dir="ltr" autocomplete="off" autocapitalize="off" autocorrect="off"
+           spellcheck="false" inputmode="none" placeholder="اكتب بالروسي هنا">
+    <div class="h-note">الحروف الكبيرة والصغيرة ونقطتين الـ ё مش فارقين</div>
+    <div class="kb" id="kb">${kbHtml}</div>
+    <div class="tr-actions" id="trActions">
+      <button class="btn-ghost" onclick="hintHard()">💡 تلميح</button>
+      <button class="btn-ghost" onclick="revealHard()">عرض الإجابة</button>
+      <button class="cta" style="padding:12px 30px;" onclick="checkHard()">تحقق</button>
+    </div>
+    <div class="tr-feedback" id="trFeedback"></div>`;
+
+  const input = document.getElementById("hInput");
+  input.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); checkHard(); } });
+  document.getElementById("kb").addEventListener("click", e => {
+    const b = e.target.closest(".kb-key");
+    if (!b || hDone) return;
+    if (b.dataset.k) input.value += b.dataset.k;
+    else if (b.dataset.act === "space") input.value += " ";
+    else if (b.dataset.act === "back") input.value = input.value.slice(0, -1);
+    else if (b.dataset.act === "clear") input.value = "";
+  });
+}
+
+function hintHard(){
+  if (hDone) return;
+  hHint = true;
+  document.getElementById("hHint").textContent = "💡 أول كلمة: " + hCurrent.ru.split(" ")[0];
+}
+
+function finishQuestionHard(verdictHtml, points){
+  hDone = true;
+  hScore += points;
+  document.getElementById("trScore").textContent = hScore;
+  const full = hCurrent.ru + (hCurrent.end || "");
+  document.getElementById("trActions").style.display = "none";
+  document.getElementById("kb").style.display = "none";
+  document.getElementById("trFeedback").innerHTML = `
+    ${verdictHtml}
+    <div class="answer">${full}</div>
+    <div><button class="play" onclick="ruPlayAudio('${full.replace(/'/g, "\\'")}')">🔊 اسمعها</button></div>
+    <button class="cta" style="padding:12px 34px;" onclick="hIdx++; nextHard();">${hIdx+1 >= hRound.length ? "النتيجة" : "التالي ←"}</button>`;
+  ruPlayAudio(full);
+}
+
+function checkHard(){
+  if (hDone) return;
+  const typed = document.getElementById("hInput").value;
+  const g = gradeHard(typed, hCurrent);
+  if (g === "empty") { document.getElementById("hHint").textContent = "اكتب ترجمتك الأول"; return; }
+  if (g === "ok") {
+    hCorrect++;
+    finishQuestionHard(`<div class="verdict good">✓ ترجمة صح! ${hHint ? "(بتلميح)" : "🎉"}</div>`, hHint ? 6 : 10);
+  } else if (g === "close") {
+    finishQuestionHard(`<div class="verdict close">≈ قريب جداً — فيه حرف أو حرفين غلط</div><div class="your">إنت كتبت: ${typed}</div><div class="h-note">الصح:</div>`, 5);
+  } else {
+    finishQuestionHard(`<div class="verdict bad">✗ مش صح. إنت كتبت: ${typed}</div><div class="h-note">الصح:</div>`, 0);
+  }
+}
+
+function revealHard(){
+  if (hDone) return;
+  finishQuestionHard(`<div class="verdict bad">الإجابة الصح:</div>`, 0);
+}
+
+function finishHard(){
+  document.getElementById("trBar").style.width = "100%";
+  const xp = Math.round(hScore / 2);
+  RuProgress.addXp(xp, "translate_hard_round");
+  RuProgress.markSectionComplete("translate");
+  ruRenderStatsBar("statsBar");
+  const best = loadBest();
+  if (!best.trHard || hScore > best.trHard) { best.trHard = hScore; localStorage.setItem(BEST_KEY, JSON.stringify(best)); }
+  const emoji = hCorrect >= 9 ? "🏆" : hCorrect >= 6 ? "🎉" : hCorrect >= 3 ? "👍" : "💪";
+  document.getElementById("trBody").innerHTML = `
+    <div class="result-box">
+      <div class="big">${emoji}</div>
+      <div class="score-num">${hCorrect} / ${hRound.length}</div>
+      <p>ترجمات صح 100% — إجمالي النقط ${hScore} من ${hRound.length*10} — كسبت ${xp} XP</p>
+      <div class="result-actions">
+        <button class="cta" onclick="startHard()">جولة جديدة</button>
+        <button class="btn-ghost" onclick="exitRound()">رجوع</button>
+      </div>
+    </div>`;
+}
+
 </script>
 </body>
 </html>
